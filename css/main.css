@@ -1,0 +1,245 @@
+/*! HTML5 Boilerplate v4.3.0 | MIT License | http://h5bp.com/ */
+
+/*
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+html,
+button,
+input,
+select,
+textarea {
+    color: #222;
+}
+
+html {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/*
+ * Remove text-shadow in selection highlight: h5bp.com/i
+ * These selection rule sets have to be separate.
+ * Customize the background color to match your design.
+ */
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/*
+ * Remove the gap between images, videos, audio and canvas and the bottom of
+ * their containers: h5bp.com/i/440
+ */
+
+audio,
+canvas,
+img,
+video {
+    vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+
+textarea {
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Browse Happy prompt
+   ========================================================================== */
+
+.browsehappy {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+body{
+    background-color: #F2F2F2;
+}
+
+h1{
+    text-align: center;
+}
+
+#chat{
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    background-color: #fff;
+    margin: 0 auto;
+    width: 500px;
+    height: 500px;
+    overflow: auto;
+    padding: 20px;
+}
+
+#chat .item{
+    background-color: #F2F2F2;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px
+}
+
+#chat .item p{
+    margin: 0;
+    padding: 0;
+}
+
+.sender{
+    color: #444;
+}
+
+.message{
+    color: #666;
+    font-size: 0.9em;
+}
+
+#inputArea{
+    width: 540px;
+    margin: 20px auto;
+    position:relative;
+}
+
+
+#messageInput, input[type="text"], input[type="password"]{
+
+    width: 500px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    display: block;
+    border: none;
+    border-radius: 5px;
+    padding: 20px; 
+    border: 1px solid #CCC;
+    line-height: 1.4;
+    resize:none;
+    outline: none;
+    transition: height 0.2s ease 0s;
+
+}
+
+input[type="submit"]{
+    width:100px;
+    height:40px;
+    cursor: pointer;
+    background-color: #296fe2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    display:block;
+    position:absolute;
+    right:0;
+}
+input[type="submit"]:hover{
+    background-color: #356bc5;
+}
+
+
+/*
+    LOGOUT
+*/
+
+a.button{
+    padding:0 15px 0 15px;
+    text-decoration: none;
+    cursor: pointer;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    display:block;
+    position: absolute;
+    right: 50px;
+    top: 50px;
+    text-align: center;
+    line-height: 40px;
+}
+
+a.login {
+    background-color: #296fe2;
+}
+
+a.register{
+    top:100px;
+    background-color: #202020;
+}
+
+.error{
+    text-align: center;
+    color:#e74c3c;
+    font-size: 20px;
+}
+
+#loginArea{
+    display: none;
+}
+
+#loginArea{
+    position: absolute;
+    width: 600px;
+    height: 300px;
+    padding-top: 10px;
+    margin-left: -300px;
+    top: 200px;
+    left:50%;
+    z-index: 50;
+    background-color: #F9F9F9;
+    border-radius: 6px;
+    box-shadow: 0 15px 15px rgba(0, 0, 0, 0.2);
+}
+
+#loginArea h2{
+    text-align:center; 
+}
+
+#loginArea .button{
+    margin-right: 28px;
+}
+
+#logoutButton{
+    display: none;
+}
