@@ -8,7 +8,7 @@ Le code est commenté de partout pour expliquer les démarches, mais soit ...
 
 ###Ca fonctionne comme ceci :
 
-Le serveur tourne avec un fichier JavaScript qui lance une connexion via websocket à chaque page qui est chargée. 
+Le serveur tourne avec un fichier JavaScript qui lance une connexion via websocket à chaque client qui charge une page. 
 
 Le websocket est un protocole qui permet d'établir une connexion de longue durée entre le client et le serveur. Lors de ces connexions, des échanges peuvent se faire facilement entre les deux points, avec une latence minime, et sans devoir passer par des requêtes HTTP.  
 Extrêmement bénéfique niveau utilisation des resources donc.
