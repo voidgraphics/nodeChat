@@ -10,6 +10,7 @@ $(document).ready(function(){
 	var loginButton = $('#loginButton');
 	var registerButton = $('#registerButton');
 	var logoutButton = $('#logoutButton');
+	var usersArea = $('#users');
 	var error = 0;
 	
 	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
@@ -53,4 +54,5 @@ $(document).ready(function(){
 			error = 1;
 		});
 	});
+
 });

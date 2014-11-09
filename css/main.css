@@ -243,3 +243,30 @@ a.register{
 #logoutButton{
     display: none;
 }
+
+/* 
+    USERS LIST 
+*/
+
+#users {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 150px;
+
+    border: 1px solid #CCC;
+    background-color: #fff;
+}
+
+#users h2 {
+    width: 150px;
+    font-size: .8em;
+    text-align: center;
+}
+
+p.user {
+    width: 130px;
+    padding: 5px 0 5px 20px;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+}
