@@ -35,6 +35,7 @@ io.sockets.on('connection', function(socket){
 		port: "8889"
 	});
 
+
 	/**
 	*	EVENTS
 	*	Ecouteurs pour les événements qui sont envoyés par les clients (voir main.js, login.js, register.js). 
@@ -56,10 +57,13 @@ io.sockets.on('connection', function(socket){
 			else { 
 				//  Sinon c'est que tout va bien et on envoie un event 'logged in' au client
 				socket.emit('logged in');
+				io.sockets.emit('new user logged', username); // On emet un event pour ajouter un utilisateur à la liste des connectés 
 				console.log(username + " has logged in to the chat");
 			}
 		});
 	});
+
+
 
 
 	/**
@@ -94,7 +98,8 @@ io.sockets.on('connection', function(socket){
 	**/
 	socket.on('logout', function(user){
 		//  On envoie un event 'logged out' au client
-		socket.emit('logged out');
+		socket.emit('logged out', user);
+		io.sockets.emit('user disconnected', user);
 		console.log(user + ' has logged out');
 	});
 

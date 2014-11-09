@@ -9,6 +9,7 @@ $(document).ready(function(){
 	var messageBox = $('#messageInput');
 	var logoutButton = $('#logoutButton');
 	var chat = $('#chat > .inner');
+	var users = [];
 
 	//  On scrolle tout en bas de la div pour afficher le message le plus récent
 	$("#chat").scrollTop($("#chat")[0].scrollHeight);
@@ -55,10 +56,22 @@ $(document).ready(function(){
 	})
 
 	//  Ecouteur qui supprime la valeur du champ caché quand le serveur répond avec la confirmation 'logged out'
-	socket.on('logged out', function(){
+	socket.on('logged out', function(data){
 		username.val("Anonymous");
 		logoutButton.hide();
 		$('#loginButton').show(); $('#registerButton').show();
 	});
+
+	//	Si un utilisateur se déconnecte on le retire de la liste des connectés
+	socket.on('user disconnected', function(username){
+		var id = '#'+username; // On récupère l'id de l'utilisateur qui se déconnecte 
+		$(id).remove(); // On le supprime de la liste
+	});
+
+	//	Si un utilisateur se connect on l'ajoute à la liste des connectés
+	socket.on('new user logged', function(username){
+		$('#users').append('<p class="user" id="'+ username +'">'+ username +'</p>');
+	});
+
 });
 
