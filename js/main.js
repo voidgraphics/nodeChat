@@ -4,11 +4,12 @@ $(document).ready(function(){
 	var socket = io.connect();
 
 	//  On récupère les éléments dont on aura besoin dans le script
-	var messageForm = $('#inputArea');
-	var username = $('#username');
-	var messageBox = $('#messageInput');
-	var logoutButton = $('#logoutButton');
-	var chat = $('#chat > .inner');
+	var messageForm = $('#inputArea'),
+	username = $('#username'),
+	messageBox = $('#messageInput'),
+	logoutButton = $('#logoutButton'),
+	onlineUsers = $('#onlineUsers'),
+	chat = $('#chat > .inner');
 
 	//  On scrolle tout en bas de la div pour afficher le message le plus récent
 	$("#chat").scrollTop($("#chat")[0].scrollHeight);
@@ -60,5 +61,15 @@ $(document).ready(function(){
 		logoutButton.hide();
 		$('#loginButton').show(); $('#registerButton').show();
 	});
+
+	//  Ecouteur qui affiche les utilisateurs connectés chaque fois que le serveur détecte un changement
+	socket.on('updateUsersList', function(data){
+		var html = '';
+		for(i=0; i < data.length; i++){
+			html += '<li> '+ data[i] + '</li>';
+		}
+		onlineUsers.html(html);
+	});
+
 });
 
