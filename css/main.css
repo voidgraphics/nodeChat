@@ -107,10 +107,12 @@ h1{
 }
 
 #chat{
+    position: absolute;
     border: 1px solid #CCC;
     border-radius: 5px;
     background-color: #fff;
-    margin: 0 auto;
+    margin-left: -270px;
+    left:50%;
     width: 500px;
     height: 500px;
     overflow: auto;
@@ -140,8 +142,10 @@ h1{
 
 #inputArea{
     width: 540px;
-    margin: 20px auto;
-    position:relative;
+    margin-left: -270px;
+    top:650px;
+    left:50%;
+    position:absolute;
 }
 
 
@@ -242,4 +246,16 @@ a.register{
 
 #logoutButton{
     display: none;
+}
+
+.online{
+    float:left;
+    margin-left: 100px;
+    display:block;
+    width:200px;
+    padding:25px;
+    overflow: auto;
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    background-color: #fff;
 }
