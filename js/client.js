@@ -27,7 +27,10 @@ $(document).ready(function(){
 		e.preventDefault();
 		//  La méthode socket.emit envoie un événement au serveur. 
 		//  On précise le nom de l'événement en premier argument, et un objet avec les infos à passer en 2e argument.
-		socket.emit('send message', { "message" : messageBox.val(), "author" : username.val() });
+		socket.emit('send message', { "message" : messageBox.val(), "author" : username.val() }, function(data){
+			//  Callback en cas d'erreur
+			chat.append('<div class="item error"><p>'+ data +'</p></div>');
+		});
 		//  On remet le focus dans le textarea et on le vide
 		messageBox.focus();
 		messageBox.val('');
@@ -38,8 +41,9 @@ $(document).ready(function(){
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
 	//  et une fonction à exécuter quand l'événement se déclenche en deuxième argument.
 	socket.on('new message', function(data){
+
 		//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
-		chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p>');
+		chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
 
 		//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
 		var atBottom = $('#chat').scrollTop() + $('#chat').innerHeight()>=$('#chat')[0].scrollHeight;
@@ -70,9 +74,12 @@ $(document).ready(function(){
 		onlineUsers.html(html);
 	});
 
-	//  On affiche une erreur en cas de commande érronée
-	socket.on('errorCmd', function(){
-		chat.append('<p class="error">Wrong info / Or command not found</p>');
+	socket.on('whisper', function(data){
+		chat.append('<div class="item whisper"><p class="Author">Whisper from ' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+	});
+
+	socket.on('whisper sent', function(data){
+		chat.append('<div class="item whisper"><p class="Author">Whisper to ' + data.whisperTarget + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
 	});
 
 });
