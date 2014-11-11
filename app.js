@@ -25,7 +25,6 @@ app.use("/node_modules", express.static(__dirname + '/node_modules'));
 
 var onlineUsers = [];
 
-
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
 
@@ -52,6 +51,8 @@ io.sockets.on('connection', function(socket){
 
 	}
 
+	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
+	socket.emit('updateUsersList', onlineUsers);
 
 	/**
 	*	EVENTS
@@ -77,13 +78,13 @@ io.sockets.on('connection', function(socket){
 				socket.username = username;
 				//  Puis on ajoute le nom au tableau des uses connectés
 				onlineUsers.push(username);
-				//  Puis on envoie à tout le monde un event pour mettre la liste à jour
+
+				// 	Puis on rafraichit la liste de tous les utilisateurs.
 				io.sockets.emit('updateUsersList', onlineUsers);
 				console.log(username + " has logged in to the chat");
 			}
 		});
 	});
-
 
 	/**
 	*	Un utilisateur envoie un message. 
