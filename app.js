@@ -23,6 +23,8 @@ app.use("/js", express.static(__dirname + '/js'));
 app.use("/node_modules", express.static(__dirname + '/node_modules'));
 
 
+var onlineUsers = [];
+
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
 
@@ -35,12 +37,28 @@ io.sockets.on('connection', function(socket){
 		port: "8889"
 	});
 
+
+	/**
+	*	FONCTIONS
+	**/
+
+	function offlineUser(){
+
+		//  On retire le nom de l'utilisateur du tableau online
+		onlineUsers.splice(onlineUsers.indexOf(socket.username), 1);
+		//  Puis on dit à tous les clients de mettre la liste à jour 
+		io.sockets.emit('updateUsersList', onlineUsers);
+
+	}
+
+	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
+	socket.emit('updateUsersList', onlineUsers);
+
 	/**
 	*	EVENTS
 	*	Ecouteurs pour les événements qui sont envoyés par les clients (voir main.js, login.js, register.js). 
 	*	Le client envoie un event avec des informations, le serveur traite les informations et renvoie un événement en réponse.	
 	**/
-
 
 	/**
 	*	Un utilisateur se connecte. 
@@ -56,11 +74,16 @@ io.sockets.on('connection', function(socket){
 			else { 
 				//  Sinon c'est que tout va bien et on envoie un event 'logged in' au client
 				socket.emit('logged in');
+				//  On stocke le nom d'utilisateur dans le socket (utile pour la déconnexion)
+				socket.username = username;
+				//  Puis on ajoute le nom au tableau des uses connectés
+				onlineUsers.push(username);
+				// 	Puis on rafraichit la liste de tous les utilisateurs.
+				io.sockets.emit('updateUsersList', onlineUsers);
 				console.log(username + " has logged in to the chat");
 			}
 		});
 	});
-
 
 	/**
 	*	Un utilisateur envoie un message. 
@@ -86,6 +109,10 @@ io.sockets.on('connection', function(socket){
 	socket.on('disconnect', function(){
 		//  On ferme la connection à MySQL
 		connection.end();
+		//  Si la personne ne s'est pas login et donc n'a pas de nom d'utilisateur, on sort de la fonction
+		if(!socket.username) return;
+		//  Si on arrive jusqu'ici alors on a un username et on le retire du tableau
+		offlineUser();
 	});
 
 
@@ -95,6 +122,7 @@ io.sockets.on('connection', function(socket){
 	socket.on('logout', function(user){
 		//  On envoie un event 'logged out' au client
 		socket.emit('logged out');
+		offlineUser();
 		console.log(user + ' has logged out');
 	});
 
@@ -126,5 +154,4 @@ io.sockets.on('connection', function(socket){
 			else console.log("There is already an account called " + username + ". Please choose another one.");	   
 		});
 	});
-
 });
