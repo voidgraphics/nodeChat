@@ -260,7 +260,26 @@ a.register{
     background-color: #fff;
 }
 
-/* FORMAT MESSAGE AVEC COMMANDE */
+#chat .item.whisper{
+    background-color: #606060;
+}
 
-span.red { color:red; }
-span.bold { font-weight: bold; }
+.item.whisper .Author, .item.whisper .message, .item.error p{
+    color:#fff;
+}
+
+#chat .item.error{
+    background-color: #de565a;
+}
+
+.red{
+    color: #de565a;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.italic{
+    font-style: italic;
+}
