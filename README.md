@@ -37,9 +37,10 @@ les `id` sont des INT en auto_increment et clé primaire, le `message_content` e
 ###A faire :
 
 - ~~Système de création de compte / connexion~~ // FAIT  
-- Module affichant les utilisateurs connectés  
+- ~~Module affichant les utilisateurs connectés~~ // FAIT
 - Emotes  
-- Système de messagerie privée / whispers  
+- ~~Système de messagerie privée / whispers~~  // FAIT
+- Commandes en tout genre // EN COURS
 - Notifications dans l'onglet du navigateur
 
 Si vous souhaitez contribuer au projet, soyez propres avec votre code et commentez votre démarche.
