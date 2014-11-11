@@ -259,3 +259,8 @@ a.register{
     border-radius: 5px;
     background-color: #fff;
 }
+
+/* FORMAT MESSAGE AVEC COMMANDE */
+
+span.red { color:red; }
+span.bold { font-weight: bold; }

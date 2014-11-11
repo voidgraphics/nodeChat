@@ -38,7 +38,6 @@ $(document).ready(function(){
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
 	//  et une fonction à exécuter quand l'événement se déclenche en deuxième argument.
 	socket.on('new message', function(data){
-
 		//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
 		chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p>');
 
@@ -69,6 +68,11 @@ $(document).ready(function(){
 			html += '<li> '+ data[i] + '</li>';
 		}
 		onlineUsers.html(html);
+	});
+
+	//  On affiche une erreur en cas de commande érronée
+	socket.on('errorCmd', function(){
+		chat.append('<p class="error">Wrong info / Or command not found</p>');
 	});
 
 });

@@ -51,6 +51,53 @@ io.sockets.on('connection', function(socket){
 
 	}
 
+
+	//	Retourne true si le message passé en paramettre commence par "/" et est donc une commande
+	//	Retourne false sinon
+	function isSetCmd(message) {
+		if(message.charAt(0) == "/")
+			return true;
+		else
+			return false;
+	}
+
+	//	Fonction qui swith les commandes 
+	//	Renvoie le message formaté en fonction de la commande demandée
+	function findCmd(message) {
+		var cmd = [];
+		// /cmd message ou /w Swith message
+		cmd = message.split(" ", 3);
+		return cmd;
+	}
+
+	//	Format le texte selon la commande demandée
+	//	Retourne le texte formaté
+	function executeCmd(cmd,message){
+		//	On sauvegarde la commande dans une variable.
+		var commande = cmd[0];
+
+		//	Si on a entré aucun message après la commande on retourne un erreur.
+		if(cmd[1] == undefined){
+			message = false;
+			return message;
+		}
+
+		//	On regarde quelle commande est demandée.
+		switch(commande) {
+		    case "/red":
+		    	message = "<span class='red'>"+ message.replace(cmd[0],"") +"</span>";
+		        break;
+		    case "/bold":
+		    	message = "<span class='bold'>"+ message.replace(cmd[0],"") +"</span>";
+		        break;
+		    default:
+		    	message = false;
+		}
+
+		//	Enfin on renvoie le message formaté.
+		return message;
+	}
+
 	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
 	socket.emit('updateUsersList', onlineUsers);
 
@@ -90,17 +137,29 @@ io.sockets.on('connection', function(socket){
 	*	Un utilisateur envoie un message. 
 	**/
 	socket.on('send message', function(data){
-		//  On enregistre le message dans la BDD
-		var queryString = 'INSERT INTO messages (message_content, author) VALUES ("' +  data.message +'", "' + data.author + '");';
-		connection.query(queryString, function(error, results){
-			//  On affiche une erreur dans la console si il y a un soucis avec la requête
-			if(error) throw error;
-		});
-		//  On envoie un event 'new message' avec le contenu du message à TOUS les clients connectés 
-		//  io.sockets.emit -> tous les clients connectés contrairement à
-		//  socket.emit -> uniquement le client qui a envoyé l'event originel
-		io.sockets.emit('new message', data);
-		console.log(data.author + ' sent a message : ' + data.message);
+		if(isSetCmd(data.message)){	//	On vérifie avant tout que le message n'a pas de commande (commence par "/"")
+			//	Si c'est le cas on va rechercher la commande
+			var cmdMessage;
+
+			cmdMessage = findCmd(data.message); //	Renvoie un tableau contenant à l'index 0 la commande et si besoin à l'index 1 le pseudo (dans le cas d'un whisper)
+			data.message = executeCmd(cmdMessage, data.message); //  On formate le message
+		}
+		if(data.message){	//	Si on a pas d'erreur 
+			//  On enregistre le message dans la BDD
+			var queryString = 'INSERT INTO messages (message_content, author) VALUES ("' +  data.message +'", "' + data.author + '");';
+			connection.query(queryString, function(error, results){
+				//  On affiche une erreur dans la console si il y a un soucis avec la requête
+				if(error) throw error;
+			});
+			//  On envoie un event 'new message' avec le contenu du message à TOUS les clients connectés 
+			//  io.sockets.emit -> tous les clients connectés contrairement à
+			//  socket.emit -> uniquement le client qui a envoyé l'event originel
+			io.sockets.emit('new message', data);
+			console.log(data.author + ' sent a message : ' + data.message);
+		}else {
+			//	Sinon on emet un event errorCmd
+			socket.emit('errorCmd');
+		}
 	});
 
 
