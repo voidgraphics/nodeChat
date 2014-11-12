@@ -104,6 +104,10 @@ $(document).ready(function(){
 		scroll();
 	});
 
+	socket.on('mute error', function(name){
+		chat.append('<p>' + name + ' is not online.</p>');
+	});
+
 	socket.on('allow', function(name){
 		if(muted.indexOf(name) != -1){
 			muted.splice(muted.indexOf(name), 1);

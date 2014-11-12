@@ -102,7 +102,10 @@ io.sockets.on('connection', function(socket){
 			case "/mute":
 				private = true;
 				var name = getName(data.message);
-				socket.emit('mute', name);
+				if(name in onlineUsers)
+					socket.emit('mute', name);
+				else
+					socket.emit('mute error', name);
 				break;
 			case "/allow":
 				private = true;
