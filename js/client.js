@@ -9,10 +9,19 @@ $(document).ready(function(){
 	messageBox = $('#messageInput'),
 	logoutButton = $('#logoutButton'),
 	onlineUsers = $('#onlineUsers'),
+	muted = [];
 	chat = $('#chat > .inner');
 
 	//  On scrolle tout en bas de la div pour afficher le message le plus récent
 	$("#chat").scrollTop($("#chat")[0].scrollHeight);
+
+	function scroll(){
+		//  bug pour le moment
+		//var atBottom = $('#chat').scrollTop() + $('#chat').innerHeight()>=$('#chat')[0].scrollHeight;
+		//if(atBottom){
+			$('#chat').animate({scrollTop: $('#chat > .inner').outerHeight()});
+		//}
+	}
 
 	//  Ecouteur qui permet de soumettre le formulaire quand on appuie sur Enter alors qu'on se trouve dans un textarea
 	messageBox.keypress(function(e){
@@ -41,14 +50,13 @@ $(document).ready(function(){
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
 	//  et une fonction à exécuter quand l'événement se déclenche en deuxième argument.
 	socket.on('new message', function(data){
+		//  On check si l'auteur du message est dans la liste des gens bloqués, s'il ne l'est pas on affiche le message
+		if(muted.indexOf(data.author) == -1){
+			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
+			chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
 
-		//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
-		chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
-
-		//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
-		var atBottom = $('#chat').scrollTop() + $('#chat').innerHeight()>=$('#chat')[0].scrollHeight;
-		if(atBottom){
-			$('#chat').animate({scrollTop: $('#chat > .inner').outerHeight()});
+			//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
+			scroll();
 		}
 	});
 
@@ -75,11 +83,35 @@ $(document).ready(function(){
 	});
 
 	socket.on('whisper', function(data){
-		chat.append('<div class="item whisper"><p class="Author">Whisper from ' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+		if(muted.indexOf(data.author) == -1){
+			chat.append('<div class="item whisper"><p class="Author">Whisper from ' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+			scroll();
+		}
 	});
 
 	socket.on('whisper sent', function(data){
 		chat.append('<div class="item whisper"><p class="Author">Whisper to ' + data.whisperTarget + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+		scroll();
+	});
+
+	socket.on('mute', function(name){
+		if(muted.indexOf(name) != -1){
+			chat.append('<p>' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
+		} else {
+			muted.push(name);
+			chat.append('<p>' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
+		}
+		scroll();
+	});
+
+	socket.on('allow', function(name){
+		if(muted.indexOf(name) != -1){
+			muted.splice(muted.indexOf(name), 1);
+			chat.append('<p>You will now see messages from ' + name + ' again.</p>');
+		} else {
+			chat.append('<p>' + name + ' is not currently muted.</p>');
+		}
+		scroll();
 	});
 
 });

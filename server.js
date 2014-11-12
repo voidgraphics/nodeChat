@@ -91,13 +91,23 @@ io.sockets.on('connection', function(socket){
 				var message = data.message.replace(command, "").trim();
 				data.message = "<span class='red'>"+ message + "</span>";
 				break;
-			case "/bold":
+			case "/b":
 				var message = data.message.replace(command, "").trim();
 				data.message = "<span class='bold'>"+ message + "</span>";
 				break;
-			case "/italic":
+			case "/i":
 				var message = data.message.replace(command, "").trim();
 				data.message = "<span class='italic'>"+ message + "</span>";
+				break;
+			case "/mute":
+				private = true;
+				var name = getName(data.message);
+				socket.emit('mute', name);
+				break;
+			case "/allow":
+				private = true;
+				var name = getName(data.message);
+				socket.emit('allow', name);
 				break;
 		}
 	}
