@@ -123,7 +123,7 @@ h1{
     background-color: #F2F2F2;
     padding: 20px;
     border-radius: 5px;
-    margin-bottom: 20px
+    margin-bottom: 20px;
 }
 
 #chat .item p{
@@ -162,7 +162,8 @@ h1{
     line-height: 1.4;
     resize:none;
     outline: none;
-    transition: height 0.2s ease 0s;
+    -webkit-transition: height 0.2s ease 0s;
+            transition: height 0.2s ease 0s;
 
 }
 

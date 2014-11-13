@@ -29,9 +29,9 @@ La base de données doit s'appeller `Chat` et contenir deux tables :
 
   
 - `messages` avec 3 champs (`id`, `message_content`, `author`)  
-- `users` avec 3 champs (`id`, `username`, `password`)
+- `users` avec 4 champs (`id`, `username`, `password`, `authority`)
 
-les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT et le reste sont des VARCHAR
+les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT, le `authority` est un INT qui se met à 0 par défaut et le reste sont des VARCHAR
 
 
 ###A faire :
