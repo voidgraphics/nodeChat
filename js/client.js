@@ -53,7 +53,11 @@ $(document).ready(function(){
 		//  On check si l'auteur du message est dans la liste des gens bloqués, s'il ne l'est pas on affiche le message
 		if(muted.indexOf(data.author) == -1){
 			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
-			chat.append('<div class="item"><p class="Author">' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+			chat.append('<div class="item"><span class="Author">' 
+					+ data.author + 
+					'&nbsp;:</span><span class="message"> ' 
+					+ data.message +
+					'</span><span class="time">'+ data.date.hours +':'+ data.date.minutes +'</span></div>');
 
 			//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
 			scroll();
@@ -69,28 +73,48 @@ $(document).ready(function(){
 	//  Ecouteur qui supprime la valeur du champ caché quand le serveur répond avec la confirmation 'logged out'
 	socket.on('logged out', function(){
 		username.val("Anonymous");
-		logoutButton.hide();
+		$('.logged').hide();
+		$('.anon').show();
 		$('#loginButton').show(); $('#registerButton').show();
 	});
 
 	//  Ecouteur qui affiche les utilisateurs connectés chaque fois que le serveur détecte un changement
 	socket.on('updateUsersList', function(data){
 		var html = '';
-		for(i=0; i < data.length; i++){
-			html += '<li> '+ data[i] + '</li>';
+		var myStatus, myAvatar;
+		for(var user in data){
+			var avatar = '<img src="http://www.gravatar.com/avatar/' + data[user].avatarHash + '?d=retro" alt="avatar" />';
+			var status = data[user].status=="online"?"":' <span class="status">(' + data[user].status + ')</span>';
+			html += '<li> ' + avatar + data[user].username + status + '</li>';
+			if(data[user].username == username.val()){
+				myAvatar = '<img src="http://www.gravatar.com/avatar/' + data[user].avatarHash + '?d=retro" alt="avatar" />'
+				myStatus = data[user].status;
+			}
 		}
 		onlineUsers.html(html);
+		$('.logged .head .avatarArea').html(myAvatar);
+		$('.logged .head .status span').html(myStatus);
 	});
 
 	socket.on('whisper', function(data){
 		if(muted.indexOf(data.author) == -1){
-			chat.append('<div class="item whisper"><p class="Author">Whisper from ' + data.author + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+			chat.append('<div class="item whisper"><span class="Author">From '
+				+ data.author + 
+				'&nbsp;:</span><span class="message"> ' 
+				+ data.message +
+				'</span><span class="time">' 
+				+ data.date.hours +':'+ data.date.minutes +
+				'</span></div>');
 			scroll();
 		}
 	});
 
 	socket.on('whisper sent', function(data){
-		chat.append('<div class="item whisper"><p class="Author">Whisper to ' + data.whisperTarget + '&nbsp;:</p><p class="message">' + data.message +'</p></div>');
+		chat.append('<div class="item whisper"><span class="Author">To ' 
+			+ data.whisperTarget + '&nbsp;:</span><span class="message"> ' 
+			+ data.message +'</span><span class="time">' 
+			+ data.date.hours +':'+ data.date.minutes +
+			'</span></div>');
 		scroll();
 	});
 

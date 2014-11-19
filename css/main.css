@@ -99,178 +99,302 @@ textarea {
 
 
 body{
-    background-color: #F2F2F2;
+    background-color: #eee;
+    font-family: 'Open Sans';
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1.4px;
 }
 
-h1{
+#loginArea, #registerArea{
+    display:none;
+    position: relative;
+    z-index: 5655;
+    background-color: #eee;
+    width:370px;
+    height:370px;
+    margin:150px auto;
+    border-radius: 6px;
+    box-shadow:0 0 40px rgba(0, 0, 0, 0.15);
+}
+
+#registerArea{
+    height: 430px;
+}
+
+#overlay{
+    display:none;
+    position: fixed;
+    top:0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 50;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+#loginArea h2, #registerArea h2{
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 11px;
+    color:#747474;
+    padding:45px 0 30px 0;
     text-align: center;
 }
 
-#chat{
-    position: absolute;
-    border: 1px solid #CCC;
-    border-radius: 5px;
+#loginArea input[type="text"], #loginArea input[type="password"],
+#registerArea input[type="text"], #registerArea input[type="password"], #registerArea input[type="email"] {
     background-color: #fff;
-    margin-left: -270px;
-    left:50%;
-    width: 500px;
-    height: 500px;
-    overflow: auto;
-    padding: 20px;
-}
-
-#chat .item{
-    background-color: #F2F2F2;
-    padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-#chat .item p{
-    margin: 0;
-    padding: 0;
-}
-
-.sender{
-    color: #444;
-}
-
-.message{
-    color: #666;
-    font-size: 0.9em;
-}
-
-#inputArea{
-    width: 540px;
-    margin-left: -270px;
-    top:650px;
-    left:50%;
-    position:absolute;
-}
-
-
-#messageInput, input[type="text"], input[type="password"]{
-
-    width: 500px;
-    margin: 0 auto;
-    margin-bottom: 20px;
     display: block;
+    width:246px;
+    font-family: 'Open Sans';
+    letter-spacing: 1.2px;
+    padding: 15px 20px;
+    margin: 12px 40px;
+    border-radius: 4px;
     border: none;
-    border-radius: 5px;
-    padding: 20px; 
-    border: 1px solid #CCC;
-    line-height: 1.4;
-    resize:none;
-    outline: none;
-    -webkit-transition: height 0.2s ease 0s;
-            transition: height 0.2s ease 0s;
-
 }
 
-input[type="submit"]{
-    width:100px;
-    height:40px;
-    cursor: pointer;
-    background-color: #296fe2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    display:block;
-    position:absolute;
-    right:0;
+#button{
+    border:none;
+    text-transform: uppercase;
+    font-family: 'Open Sans';
+    letter-spacing: 1.4px;
+    margin:42px auto 37px auto;
+    display: block;
+    width: 100px;
 }
-input[type="submit"]:hover{
-    background-color: #356bc5;
+
+#loginArea p, #registerArea p{
+    letter-spacing: 1.2;
+    text-align: center;
+    text-transform: uppercase;
+    color:#747474;
+}
+#loginArea p a, #registerArea p a{
+    color: #f06b6b;
+}
+
+.sidebar{
+    text-transform: uppercase;
+    position: fixed;
+    top:0;
+    left:0;
+    background-color: #2c2c2c;
+    width:290px;
+    height:100%;
+    color:#cecece;
 }
 
 
 /*
-    LOGOUT
-*/
+ *  ANONYMOUS
+ */
 
-a.button{
-    padding:0 15px 0 15px;
-    text-decoration: none;
-    cursor: pointer;
-    background-color: #e74c3c;
+.sidebar p{
+    text-align: center;
+    margin:31px 0;
+}
+
+.button{
+    display:inline-block;
+    padding: 9px 0;
+    width:100px;
+    text-align: center;
+    border-radius:4px;
+    background-color: #f06b6b;
     color: white;
-    border: none;
-    border-radius: 5px;
-    display:block;
+    text-decoration: none;
+
+}
+
+#loginButton{
+    position: relative;
+    left:12%;
+}
+
+#registerButton{
+    position: relative;
+    left:18%;
+}
+
+/*
+ *  LOGGED IN
+ */
+
+ .logged{
+    display:none;
+ }
+
+.logged .head{
+    background-color: #363636;
+    height: 88px;
+    width:100%;
+    position: relative;
+    top:0;
+}
+
+.logged .head p{
+    text-align: left;
+    color:white;
+    margin: 0 0 5px 25px;
+    padding-top:27px;
+}
+
+.logged p.status{
+    color:#b4b4b4;
+    font-size: 10px;
+    margin:5px 0 25px 25px;
+    padding-top: 0;
+}
+
+.username{
+    color:#f06b6b;
+}
+
+.logged img{
     position: absolute;
-    right: 50px;
-    top: 50px;
-    text-align: center;
-    line-height: 40px;
+    top:24px;
+    right:23px;
 }
 
-a.login {
-    background-color: #296fe2;
+.logged ul{
+    margin:20px 0 20px 25px ;
+    padding:0;
 }
 
-a.register{
-    top:100px;
-    background-color: #202020;
+.logged ul li{
+    margin-bottom: 5px;
 }
 
-.error{
-    text-align: center;
-    color:#e74c3c;
-    font-size: 20px;
+.logged ul li a{
+    color:#7c7c7c;
+    text-decoration: none;
+    padding-left:0;
 }
 
-#loginArea{
-    display: none;
+.logged ul li a:hover{
+    text-decoration: underline;
+    color:#f06b6b;
 }
 
-#loginArea{
+
+/*
+ *  SIDEBAR MAIN
+ */
+
+.sidebar hr{
+    border-top: 1px solid #434343;
+    background-color:#181818;
+}
+
+.sidebar h2{
+    font-size: 11px;
+    font-weight: 600;
+    color:white;
+    margin:20px 0 20px 25px;
+}
+
+.sidebar li{
+    list-style-type: none;
+}
+
+.sidebar img{
+    width:30px;
+    height:30px;
+    border: 5px solid #1f1f1f;
+    border-radius:4px;
+}
+
+ul#onlineUsers li{
+    margin-bottom: 10px;
+}
+
+ul#onlineUsers img{
+    margin-right:8px;
+}
+
+ul#onlineUsers .status{
+    color:#747474;
+}
+
+#chat{
+    margin-left: 290px;
+}
+
+.inner{
     position: absolute;
-    width: 600px;
-    height: 300px;
-    padding-top: 10px;
-    margin-left: -300px;
-    top: 200px;
-    left:50%;
-    z-index: 50;
-    background-color: #F9F9F9;
-    border-radius: 6px;
-    box-shadow: 0 15px 15px rgba(0, 0, 0, 0.2);
+    bottom: 80px;
+    width: calc(100% - 290px);
 }
 
-#loginArea h2{
-    text-align:center; 
-}
-
-#loginArea .button{
-    margin-right: 28px;
-}
-
-#logoutButton{
-    display: none;
-}
-
-.online{
-    float:left;
-    margin-left: 100px;
-    display:block;
-    width:200px;
-    padding:25px;
-    overflow: auto;
-    border: 1px solid #CCC;
-    border-radius: 5px;
+.item{
     background-color: #fff;
+    padding: 17px 60px 16px 20px;
+    margin: 12px 40px;
+    border-radius: 4px;
+    position: relative;
 }
 
-#chat .item.whisper{
-    background-color: #606060;
+.item.whisper{
+    background-color: #474747;
+    font-style: italic;
 }
 
-.item.whisper .Author, .item.whisper .message, .item.error p{
-    color:#fff;
+.item .author{
+    color:#515151;
 }
 
-#chat .item.error{
-    background-color: #de565a;
+.item.whisper .Author{
+    color:white;
+}
+
+.item .message{
+    color:#8b8b8b;
+    letter-spacing: 1.2px;
+}
+
+.item.whisper .message{
+    color:#b7b5b5;
+}
+
+.item .time{
+    position: absolute;
+    right:20px;
+    top:16px;
+    color:#747474;
+}
+
+.item.whisper .time{
+    color: white;
+    font-style: normal;
+}
+
+#messageInput{
+    font-family: 'Open Sans';
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    background-color: #fff;
+    padding: 17px 20px 16px 20px;
+    margin: 22px 40px;
+    border-radius: 4px;
+    width: calc(100% - 410px);
+    position: absolute;
+    bottom:0;
+    border:none;
+}
+
+#messageSubmit{
+    background: #fff;
+    color:#747474;
+    border:none;
+    font-family: 'Open Sans';
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    position: absolute;
+    bottom:37px;
+    right:55px;
 }
 
 .red{
@@ -278,7 +402,7 @@ a.register{
 }
 
 .bold{
-    font-weight: bold;
+    font-weight: 700;
 }
 
 .italic{

@@ -10,6 +10,7 @@
         <meta name="description" content="Chatroom">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
     </head>
@@ -18,40 +19,74 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <h1>Hey, let's chat!</h1>
-
-        <a href='#' id ="loginButton" class='button login'>Login</a>
-        <a href='register' id"registerButton" class='button register'>Register</a>
-        <a href='#' id="logoutButton" class='button register'>Logout</a>
-
         <!-- Formulaire pour se connecter, caché par défaut jusqu'au click sur le bouton login -->
         <form action="#" id="loginArea" method="post"> 
-            <h2>Please enter your information</h2>
-            <input type="text" id="loginUsername" name="loginUsername" autofocus placeholder="Type your username">
-            <input type="password" id="password" name="password" autofocus placeholder="Type your password">
-            <input type="submit" value="Go" class="button" id="button" />
+            <h2>Log in</h2>
+            <input type="text" id="loginUsername" name="loginUsername" autofocus placeholder="Username...">
+            <input type="password" id="password" name="password"  placeholder="Password...">
+            <input type="submit" value="Log in" class="button" id="button" />
+            <p>Don't have an account? <a href='register' class='register'>Register</a></p>
         </form>
-
-        <!-- Module online -->
-        <div class="online">
-            <h2>Online:</h2>
-            <ul id="onlineUsers"></ul>
+        <!-- Formulaire pour créer un compte, caché par défaut jusqu'au click sur le bouton register -->
+        <form action="#" id="registerArea" method="post"> 
+            <h2>Register</h2>
+            <input type="text" id="loginUsername" name="loginUsername" autofocus placeholder="Username...">
+            <input type="email" id="loginUsername" name="loginUsername" autofocus placeholder="Email...">
+            <input type="password" id="password" name="password"  placeholder="Password...">
+            <input type="submit" value="Register" class="button" id="button" />
+            <p>Already have an account? <a href='register' class='login'>Log in</a></p>
+        </form>
+        <div id="overlay"></div>
+        <div class="sidebar">
+        <div class="anon">
+            <p>Welcome</p>
+            <a href='#loginArea' id="loginButton" class='button login'>Log in</a>
+            <a href='#registerArea' id="registerButton" class='button register'>Register</a>
+            <p>Or chat anonymously</p>
         </div>
+        <div class="logged">
+            <div class="head">
+                <p>Logged as: <span class="username"></span></p>
+                <p class="status">Currently <span>online</span></p>
+                <div class="avatarArea">
+                    <img src="http://www.gravatar.com/avatar/aaa?d=retro" alt="avatar" />
+                </div>
+            </div>
+            <ul>
+                <li><a href="www.gravatar.com">Change profile picture</a></li>
+                <li><a href="#">view list of chat commands</a></li>
+                <li><a href='#' id="logoutButton" >Logout</a></li>
+            </ul>
+        </div>
+            <hr />
+            <div class="online">
+                <h2>In the chat now</h2>
+                <ul id="onlineUsers">
+
+                </ul>
+            </div>
+        </div>
+        <!-- Module online -->
         <!-- Conteneur du chat -->
         <div id="chat">
-            <div class="inner"></div>
+            <div class="inner">
+                
+            </div>
+        <form id="inputArea" method="post">
+            <div>
+                <textarea name="message" id="messageInput" cols="30" rows="1" autofocus placeholder="Type your message..." ></textarea>
+                <input type="hidden" id="username" name="username" value="Anonymous">
+                <input type="submit" value="Send" id="messageSubmit" />
+            </div>
+        </form>
         </div>
 
         <!-- Zone pour envoyer des messages -->
-        <form id="inputArea" method="post">
-            <textarea name="message" id="messageInput" cols="30" rows="1" autofocus placeholder="Type your message here" ></textarea>
-            <input type="hidden" id="username" name="username" value="Anonymous">
-            <input type="submit" value="Send" class="button" id="button" />
-        </form>
         
         <script type="text/javascript" src="js/vendor/jquery-1.10.2.min.js"></script>
         <script src="js/client.js"></script>
         <script src="js/login.js"></script>
+        <script src="js/register.js"></script>
         <script src="js/vendor/jquery.autosize.js"></script>
         <script src="node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
         <script type="text/javascript">

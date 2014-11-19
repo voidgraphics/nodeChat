@@ -13,14 +13,16 @@ $(document).ready(function(){
 	var error = 0;
 	
 	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
-	$("#loginButton").click(function(){
+	$(".login.button").click(function(){
 		loginForm.fadeIn("slow");
+		$('#overlay').fadeIn("slow");
 		//  Ecouteur (trouvé sur le net ^^') qui permet de cacher le formulaire si on clique en dehors de celui-ci
 		$(document).mouseup(function (e){
 		   	if (!loginForm.is(e.target) //  if the target of the click isn't the container...
 		        	&& loginForm.has(e.target).length === 0) //  ... nor a descendant of the container
 		    	{
 		        		loginForm.hide();
+		        		$('#overlay').hide();
 		    	}
 		});
 	});
@@ -42,9 +44,11 @@ $(document).ready(function(){
 			if(error == 1) $('#error').remove();
 			error = 0;
 			loginForm.fadeOut("slow");
+			$('#overlay').fadeOut("slow");
 			$('#username').val(username.val());
-			loginButton.hide(); registerButton.hide();
-			logoutButton.show();
+			$('.anon').hide();
+			$('.logged').show();
+			$('.logged .username').html(username.val());
 		});
 
 		//  Sinon on affiche une erreur

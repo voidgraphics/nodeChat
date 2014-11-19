@@ -28,16 +28,19 @@ Il va télécharger automatiquement les dépendences et il vous suffira logiquem
 La base de données doit s'appeller `Chat` et contenir deux tables :  
 
   
-- `messages` avec 3 champs (`id`, `message_content`, `author`)  
-- `users` avec 4 champs (`id`, `username`, `password`, `authority`)
+- `messages` avec 4 champs (`id`, `message_content`, `author`, `date`)  
+- `users` avec 6 champs (`id`, `username`, `password`, `authority`, `email`, `avatarHash`")
 
-les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT, le `authority` est un INT qui se met à 0 par défaut et le reste sont des VARCHAR
+les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT, le date est un DATETIME, le `authority` est un INT qui se met à 0 par défaut et le reste sont des VARCHAR
 
 
 ###A faire :
 
 - ~~Système de création de compte / connexion~~ // FAIT  
 - ~~Module affichant les utilisateurs connectés~~ // FAIT
+- ~~Design plus propre~~ // FAIT
+- ~~Statuts~~ // FAIT
+- ~~Gravatars~~ // FAIT
 - Emotes  
 - ~~Système de messagerie privée / whispers~~  // FAIT
 - Commandes en tout genre // EN COURS

@@ -22,8 +22,10 @@ app.use("/css", express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
 app.use("/node_modules", express.static(__dirname + '/node_modules'));
 
-
+//  L'objet onlineUsers est surtout utile côté serveur, on va stocker toutes les infos sur l'user dont on à besoin, y compris le socket
 var onlineUsers = {};
+//  L'objet userList est beaucoup plus simple et ne contient que les users en ligne et leur statut. On envoie celui-là au client.
+var userList = {};
 
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
@@ -46,7 +48,17 @@ io.sockets.on('connection', function(socket){
 		//  On retire le nom de l'utilisateur du tableau online
 		delete onlineUsers[socket.username];
 		//  Puis on dit à tous les clients de mettre la liste à jour 
-		io.sockets.emit('updateUsersList', Object.keys(onlineUsers));
+		updateUserList();
+	}
+
+	function updateUserList(){
+		//  On vide la liste
+		userList = {};
+		//  Puis on ajoute les infos selon le modèle {username: blabla, status: blabla}
+		for(var user in onlineUsers){
+			userList[user] = {username: onlineUsers[user].username, status: onlineUsers[user].status, avatarHash: onlineUsers[user].avatarHash };
+		}
+		io.sockets.emit('updateUsersList', userList);
 	}
 
 	function isSetCmd(message){
@@ -87,6 +99,8 @@ io.sockets.on('connection', function(socket){
 				//  Si l'utilisateur ciblé est bien en ligne
 				if(name in onlineUsers){
 					data.message = message;
+					date = new Date();
+					data.date = { hours: addZero(date.getHours()), minutes: addZero(date.getMinutes())};
 					//  On envoie un event whisper à son socket
 					onlineUsers[name].emit('whisper', data);
 					//  Et on envoie une confirmation de whisper au client
@@ -162,6 +176,24 @@ io.sockets.on('connection', function(socket){
 				else data.message = "You do not have the rights to use this command";
 				socket.emit('new message', data);
 				break;
+			case "/away":
+				private = true;
+				onlineUsers[socket.username].status = "Away";
+				updateUserList();
+				console.log(socket.username + " is now away");
+				break;
+			case "/busy":
+				private = true;
+				onlineUsers[socket.username].status = "Busy";
+				updateUserList();
+				console.log(socket.username + " is now busy");
+				break;
+			case "/online":
+				private = true;
+				onlineUsers[socket.username].status = "online";
+				updateUserList();
+				console.log(socket.username + " is now online");
+				break;
 		}
 	}
 
@@ -174,8 +206,15 @@ io.sockets.on('connection', function(socket){
 		.replace(/'/g, "&#039;");
 	}
 
+	function addZero(i) {
+		if (i < 10) {
+			i = "0" + i;
+		}
+		return i;
+	}
+
 	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
-	socket.emit('updateUsersList', Object.keys(onlineUsers));
+	updateUserList();
 
 	/**
 	*	EVENTS
@@ -202,9 +241,10 @@ io.sockets.on('connection', function(socket){
 				socket.authority = result[0].authority;
 				//  Puis on ajoute le nom en clé et le socket en valeur à l'objet des users connectés
 				onlineUsers[socket.username] = socket;
-
-				// 	Puis on rafraichit la liste de tous les utilisateurs.
-				io.sockets.emit('updateUsersList', Object.keys(onlineUsers));
+				onlineUsers[socket.username].status = "online";
+				onlineUsers[socket.username].avatarHash = result[0].avatarHash;
+				//  Puis on rafraichit la liste de tous les utilisateurs.
+				updateUserList();
 				console.log(username + " has logged in to the chat");
 			}
 		});
@@ -216,19 +256,24 @@ io.sockets.on('connection', function(socket){
 	socket.on('send message', function(data, callback){
 
 		private = false;
-
+		
 		data.message = escapeHtml(data.message);
 		//  Si il y a une commande, on l'exécute
 		if(isSetCmd(data.message)) executeCmd(data, callback);
 
+
 		//  Si le message n'est pas privé
 		if(!private){
 			//  On enregistre le message dans la BDD
-			var queryString = 'INSERT INTO messages (message_content, author) VALUES ("' +  data.message +'", "' + data.author + '");';
+			var queryString = 'INSERT INTO messages (message_content, author, date) VALUES ("' +  data.message +'", "' + data.author + '", "' + data.date + '");';
 			connection.query(queryString, function(error, results){
 				//  On affiche une erreur dans la console si il y a un soucis avec la requête
 				if(error) throw error;
 			});
+
+			date = new Date();
+			data.date = { hours: addZero(date.getHours()), minutes: addZero(date.getMinutes())};
+
 			//  On envoie un event 'new message' avec le contenu du message à TOUS les clients connectés 
 			//  io.sockets.emit -> tous les clients connectés contrairement à
 			//  socket.emit -> uniquement le client qui a envoyé l'event originel
@@ -268,13 +313,15 @@ io.sockets.on('connection', function(socket){
 	socket.on('register', function(user){
 		var username = escapeHtml(user.username);
 		var password = md5(user.password);
+		var email = escapeHtml(user.email.trim());
+		var avatarHash = md5(email.toLowerCase());
 
 		//  On check si l'utilisateur existe déjà dans la BDD
 		var queryString = "SELECT * FROM users WHERE username = '" + username + "';";
 		connection.query(queryString, function(error, result){
 			//  Si on ne le trouve pas on l'ajoute
 			if(result.length == 0){	
-				queryString = 'INSERT INTO users (username, password) VALUES ("' +  username + '", "' + password + '");';
+				queryString = 'INSERT INTO users (username, password, email, avatarHash) VALUES ("' +  username + '", "' + password + '", "' + email + '",  "' + avatarHash + '");';
 				connection.query(queryString, function(error, result){
 					//  Si qq chose foire on affiche l'erreur dans la console
 					if(error) throw error;
