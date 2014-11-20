@@ -5,9 +5,9 @@ $(document).ready(function(){
 
 	//  On récupère les éléments dont on aura besoin dans le script
 	var registerForm = $("#registerArea");
-	var username = $('#username');
-	var password = $('#password');
-	var email = $('#email');
+	var username = $('#registerUsername');
+	var password = $('#registerPassword');
+	var email = $('#registerEmail');
 
 	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
 	$(".button.register").click(function(){

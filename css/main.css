@@ -155,7 +155,7 @@ body{
     border: none;
 }
 
-#button{
+#button, #regButton{
     border:none;
     text-transform: uppercase;
     font-family: 'Open Sans';
