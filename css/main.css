@@ -328,6 +328,21 @@ ul#onlineUsers .status{
     width: calc(100% - 290px);
 }
 
+.adminTag, .modTag{
+    position: relative;
+    right:7px;
+    top:1px;
+}
+
+.adminTag{
+    color: #f06b6b;
+}
+
+.serverMessage{
+    margin-left:53px;
+    color:#515151;
+}
+
 .item{
     background-color: #fff;
     padding: 17px 60px 16px 20px;
@@ -341,7 +356,7 @@ ul#onlineUsers .status{
     font-style: italic;
 }
 
-.item .author{
+.item .Author{
     color:#515151;
 }
 
@@ -398,7 +413,7 @@ ul#onlineUsers .status{
 }
 
 .red{
-    color: #de565a;
+    color: #f06b6b;
 }
 
 .bold{
