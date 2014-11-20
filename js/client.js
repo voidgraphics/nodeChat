@@ -52,8 +52,14 @@ $(document).ready(function(){
 	socket.on('new message', function(data){
 		//  On check si l'auteur du message est dans la liste des gens bloqués, s'il ne l'est pas on affiche le message
 		if(muted.indexOf(data.author) == -1){
+			
+			//  Le nom de l'user est en rouge pour se différencier des autres
+			if(data.author == username.val() && data.author != "Anonymous"){
+				data.author = '<span class="red">' + data.author + '</span>';
+			}
+
 			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
-			chat.append('<div class="item"><span class="Author">' 
+			chat.append('<div class="item">' + data.modSpan + data.adminSpan + '<span class="Author">' 
 					+ data.author + 
 					'&nbsp;:</span><span class="message"> ' 
 					+ data.message +
@@ -81,8 +87,10 @@ $(document).ready(function(){
 	//  Ecouteur qui affiche les utilisateurs connectés chaque fois que le serveur détecte un changement
 	socket.on('updateUsersList', function(data){
 		var html = '';
+		var nbOnline = 0;
 		var myStatus, myAvatar;
 		for(var user in data){
+			nbOnline++;
 			var avatar = '<img src="http://www.gravatar.com/avatar/' + data[user].avatarHash + '?d=retro" alt="avatar" />';
 			var status = data[user].status=="online"?"":' <span class="status">(' + data[user].status + ')</span>';
 			html += '<li> ' + avatar + data[user].username + status + '</li>';
@@ -94,6 +102,7 @@ $(document).ready(function(){
 		onlineUsers.html(html);
 		$('.logged .head .avatarArea').html(myAvatar);
 		$('.logged .head .status span').html(myStatus);
+		$('.online h2').html('In the chat now (' + nbOnline + ')');
 	});
 
 	socket.on('whisper', function(data){
@@ -120,24 +129,32 @@ $(document).ready(function(){
 
 	socket.on('mute', function(name){
 		if(muted.indexOf(name) != -1){
-			chat.append('<p>' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage">' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
 		} else {
 			muted.push(name);
-			chat.append('<p>' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage">' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
 		}
 		scroll();
 	});
 
-	socket.on('mute error', function(name){
-		chat.append('<p>' + name + ' is not online.</p>');
+	socket.on('show muted', function(){
+		if(muted.length > 0){
+			html = '<p class="serverMessage">Currently muted: ' + muted + '</p>';
+		} else 
+			html = '<p class="serverMessage">Nobody is muted.</p>';
+		chat.append(html);	
+	});
+
+	socket.on('server message', function(message){
+		chat.append('<p class="serverMessage">' + message + '</p>');
 	});
 
 	socket.on('allow', function(name){
 		if(muted.indexOf(name) != -1){
 			muted.splice(muted.indexOf(name), 1);
-			chat.append('<p>You will now see messages from ' + name + ' again.</p>');
+			chat.append('<p class="serverMessage">You will now see messages from ' + name + ' again.</p>');
 		} else {
-			chat.append('<p>' + name + ' is not currently muted.</p>');
+			chat.append('<p class="serverMessage">' + name + ' is not currently muted.</p>');
 		}
 		scroll();
 	});

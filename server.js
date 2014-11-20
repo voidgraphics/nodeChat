@@ -30,6 +30,10 @@ var userList = {};
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
 
+	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
+	updateUserList();
+	var isLogged = false;
+
 	//  Infos MySQL 
 	var connection = mysql.createConnection({
 		host: "127.0.0.1",
@@ -127,34 +131,43 @@ io.sockets.on('connection', function(socket){
 				var name = getName(data.message);
 				if(name in onlineUsers)
 					socket.emit('mute', name);
-				else
-					socket.emit('mute error', name);
+				else{
+					var errorMessage = name + " is not online";
+					socket.emit('server message', errorMessage);
+				}
 				break;
 			case "/allow":
 				private = true;
 				var name = getName(data.message);
 				socket.emit('allow', name);
 				break;
+			case "/muted":
+				private = true;
+				socket.emit('show muted');
+				break;	
 			case "/admin":
 				//  Sert seulement à tester si on a les droits d'admin ou pas
 				private = true;
+				var message
 				if(socket.authority >= 2){
-					data.message = "Admin command successful";
+					message = "Admin command successful";
 				}
-				else data.message = "You do not have the rights to use this command";
-				socket.emit('new message', data);
+				else  message = "You do not have the rights to use this command";
+				socket.emit('server message', message);
 				break;
 			case "/mod":
 				//  Sert seulement à tester si on a les droits de mod ou pas
 				private = true;
+				var message;
 				if(socket.authority >= 1){
-					data.message = "Moderator command successful";
+					message = "Moderator command successful";
 				}
-				else data.message = "You do not have the rights to use this command";
-				socket.emit('new message', data);
+				else message = "You do not have the rights to use this command";
+				socket.emit('server message', message);
 				break;
 			case "/promote":
 				private = true;
+				var message;
 				if(socket.authority >= 2){
 					var name = getName(data.message);
 					var role = roleName = getParam(data.message);
@@ -171,10 +184,10 @@ io.sockets.on('connection', function(socket){
 					//  Comme ça il doit pas se déco / reco pour profiter de ses nouveaux pouvoirs
 					if(name in onlineUsers)
 						onlineUsers[name].authority = role;
-					data.message = "Promoted " + name + " to " + roleName;
+					message = "Promoted " + name + " to " + roleName;
 				}
-				else data.message = "You do not have the rights to use this command";
-				socket.emit('new message', data);
+				else message = "You do not have the rights to use this command";
+				socket.emit('server message', message);
 				break;
 			case "/away":
 				private = true;
@@ -213,9 +226,11 @@ io.sockets.on('connection', function(socket){
 		return i;
 	}
 
-	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
-	updateUserList();
+	function authSpan(){
+		
+	}
 
+	
 	/**
 	*	EVENTS
 	*	Ecouteurs pour les événements qui sont envoyés par les clients (voir main.js, login.js, register.js). 
@@ -236,6 +251,7 @@ io.sockets.on('connection', function(socket){
 			else { 
 				//  Sinon c'est que tout va bien et on envoie un event 'logged in' au client
 				socket.emit('logged in');
+				isLogged = true;
 				//  On stocke le nom d'utilisateur dans le socket (utile pour la déconnexion) et son autorité (null = user, 1 = modo, 2 = admin)
 				socket.username = username;
 				socket.authority = result[0].authority;
@@ -261,9 +277,20 @@ io.sockets.on('connection', function(socket){
 		//  Si il y a une commande, on l'exécute
 		if(isSetCmd(data.message)) executeCmd(data, callback);
 
-
 		//  Si le message n'est pas privé
 		if(!private){
+
+			var modSpan = "", adminSpan = "";
+			if(isLogged){	
+				var userAuth = onlineUsers[data.author].authority;
+				if (userAuth == 1)
+					modSpan = '<span class="modTag">*</span>';
+				if(userAuth > 1)
+					adminSpan = '<span class="adminTag">*</span>';
+			}
+			data.modSpan = modSpan;
+			data.adminSpan = adminSpan;
+
 			var clientDate = new Date();
 			data.date = new Date().toISOString().slice(0, 19).replace('T', ' ');		
 			//  On enregistre le message dans la BDD
