@@ -9,21 +9,29 @@ $(document).ready(function(){
 	var password = $('#registerPassword');
 	var email = $('#registerEmail');
 
-	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
-	$(".button.register").click(function(){
+	function showRegisterForm(){
 		registerForm.fadeIn("slow");
-		$('#overlay').fadeIn("slow");
+		$('#regoverlay').fadeIn("slow");
 		//  Ecouteur (trouvé sur le net ^^') qui permet de cacher le formulaire si on clique en dehors de celui-ci
 		$(document).mouseup(function (e){
 		   	if (!registerForm.is(e.target) //  if the target of the click isn't the container...
 		        	&& registerForm.has(e.target).length === 0) //  ... nor a descendant of the container
 		    	{
 		        		registerForm.hide();
-		        		$('#overlay').hide();
+		        		$('#regoverlay').hide();
 		    	}
 		});
-	});
+	}
 
+	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
+	$(".button.register").click(function(){
+		showRegisterForm();
+	});
+	$("#loginArea a").click(function(){
+		$("#loginArea").hide();
+		$("#overlay").hide();
+		showRegisterForm();
+	});
 
 	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton Go
 	registerForm.submit(function(e){

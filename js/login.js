@@ -12,8 +12,7 @@ $(document).ready(function(){
 	var logoutButton = $('#logoutButton');
 	var error = 0;
 	
-	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
-	$(".login.button").click(function(){
+	function showLoginForm(){
 		loginForm.fadeIn("slow");
 		$('#overlay').fadeIn("slow");
 		//  Ecouteur (trouvé sur le net ^^') qui permet de cacher le formulaire si on clique en dehors de celui-ci
@@ -25,8 +24,18 @@ $(document).ready(function(){
 		        		$('#overlay').hide();
 		    	}
 		});
-	});
+	}
 
+	//  Ecouteur qui affiche le formulaire pour se connecter quand on clique sur le bouton login
+	$(".login.button").click(function(){
+		showLoginForm();
+	});
+	$("#registerArea a").click(function(){
+		$("#registerArea").hide();
+		$("#regoverlay").hide();
+		showLoginForm();
+	});
+	
 	//  Ecouteur qui envoie les infos de connexion au serveur quand on soumet le formulaire
 	loginForm.submit(function(e){
 		e.preventDefault();

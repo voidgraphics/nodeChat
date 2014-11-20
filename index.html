@@ -23,19 +23,19 @@
         <form action="#" id="loginArea" method="post"> 
             <h2>Log in</h2>
             <input type="text" id="loginUsername" name="loginUsername" autofocus placeholder="Username...">
-            <input type="password" id="password" name="password"  placeholder="Password...">
+            <input type="password" id="password" name="loginPassword"  placeholder="Password...">
             <input type="submit" value="Log in" class="button" id="button" />
-            <p>Don't have an account? <a href='register' class='register'>Register</a></p>
+            <p>Don't have an account? <a href='#' class='register'>Register</a></p>
         </form>
         <div id="overlay"></div>
         <!-- Formulaire pour créer un compte, caché par défaut jusqu'au click sur le bouton register -->
         <form action="#" id="registerArea" method="post"> 
             <h2>Register</h2>
-            <input type="text" id="registerUsername" name="loginUsername" autofocus placeholder="Username...">
-            <input type="email" id="registerEmail" name="email" placeholder="Email...">
-            <input type="password" id="registerPassword" name="password"  placeholder="Password...">
+            <input type="text" id="registerUsername" name="regUsername" autofocus placeholder="Username...">
+            <input type="email" id="registerEmail" name="regEmail" placeholder="Email...">
+            <input type="password" id="registerPassword" name="regPassword"  placeholder="Password...">
             <input type="submit" value="Register" class="button" id="regButton" />
-            <p>Already have an account? <a href='register' class='login'>Log in</a></p>
+            <p>Already have an account? <a href='#' class='login'>Log in</a></p>
         </form>
         <div id="regoverlay"></div>
         <div class="sidebar">
