@@ -264,15 +264,16 @@ io.sockets.on('connection', function(socket){
 
 		//  Si le message n'est pas privé
 		if(!private){
+			var clientDate = new Date();
+			data.date = new Date().toISOString().slice(0, 19).replace('T', ' ');		
 			//  On enregistre le message dans la BDD
-			var queryString = 'INSERT INTO messages (message_content, author, date) VALUES ("' +  data.message +'", "' + data.author + '", "' + data.date + '");';
+			var queryString = 'INSERT INTO messages (message_content, author, date) VALUES ("' +  data.message +'", "' + data.author + '", NOW());';
 			connection.query(queryString, function(error, results){
 				//  On affiche une erreur dans la console si il y a un soucis avec la requête
 				if(error) throw error;
 			});
 
-			date = new Date();
-			data.date = { hours: addZero(date.getHours()), minutes: addZero(date.getMinutes())};
+			data.date = { hours: addZero(clientDate.getHours()), minutes: addZero(clientDate.getMinutes())};
 
 			//  On envoie un event 'new message' avec le contenu du message à TOUS les clients connectés 
 			//  io.sockets.emit -> tous les clients connectés contrairement à
