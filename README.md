@@ -29,9 +29,9 @@ La base de données doit s'appeller `Chat` et contenir deux tables :
 
   
 - `messages` avec 4 champs (`id`, `message_content`, `author`, `date`)  
-- `users` avec 6 champs (`id`, `username`, `password`, `authority`, `email`, `avatarHash`")
+- `users` avec 7 champs (`id`, `username`, `password`, `authority`, `email`, `avatarHash`, `banned`")
 
-les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT, le date est un DATETIME, le `authority` est un INT qui se met à 0 par défaut et le reste sont des VARCHAR
+les `id` sont des INT en auto_increment et clé primaire, le `message_content` est un LONGTEXT, le date est un DATETIME, le `authority` et le `banned` sont des INT qui se mettent à 0 par défaut et le reste sont des VARCHAR
 
 
 ###A faire :
@@ -43,7 +43,7 @@ les `id` sont des INT en auto_increment et clé primaire, le `message_content` e
 - ~~Gravatars~~ // FAIT
 - Emotes  
 - ~~Système de messagerie privée / whispers~~  // FAIT
-- Commandes en tout genre // EN COURS
+- ~~Commandes en tout genre~~ // FAIT
 - Notifications dans l'onglet du navigateur
 
 Si vous souhaitez contribuer au projet, soyez propres avec votre code et commentez votre démarche.
