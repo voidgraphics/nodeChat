@@ -18,11 +18,14 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+        <div id="alert"></div>
+        <div id="alertoverlay"></div>
 
         <!-- Formulaire pour se connecter, caché par défaut jusqu'au click sur le bouton login -->
         <form action="#" id="loginArea" method="post"> 
             <h2>Log in</h2>
-            <input type="text" id="loginUsername" name="loginUsername" autofocus placeholder="Username...">
+            <div class="err"></div> 
+            <input type="text" id="loginUsername" name="loginUsername" placeholder="Username...">
             <input type="password" id="password" name="loginPassword"  placeholder="Password...">
             <input type="submit" value="Log in" class="button" id="button" />
             <p>Don't have an account? <a href='#' class='register'>Register</a></p>
@@ -31,7 +34,8 @@
         <!-- Formulaire pour créer un compte, caché par défaut jusqu'au click sur le bouton register -->
         <form action="#" id="registerArea" method="post"> 
             <h2>Register</h2>
-            <input type="text" id="registerUsername" name="regUsername" autofocus placeholder="Username...">
+            <div class="err"></div>
+            <input type="text" id="registerUsername" name="regUsername" placeholder="Username...">
             <input type="email" id="registerEmail" name="regEmail" placeholder="Email...">
             <input type="password" id="registerPassword" name="regPassword"  placeholder="Password...">
             <input type="submit" value="Register" class="button" id="regButton" />

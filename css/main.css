@@ -122,7 +122,22 @@ body{
     height: 430px;
 }
 
-#overlay, #regoverlay{
+#alert{
+    display: none;
+    position: relative;
+    z-index: 5655;
+    background-color: #eee;
+    width:370px;
+    height:40px;
+    margin:150px auto;
+    padding-top:25px;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 6px;
+    box-shadow:0 0 40px rgba(0, 0, 0, 0.15);
+}
+
+#overlay, #regoverlay, #alertoverlay{
     display:none;
     position: fixed;
     top:0;
@@ -163,6 +178,22 @@ body{
     margin:42px auto 37px auto;
     display: block;
     width: 100px;
+}
+
+#loginArea .err, #registerArea .err{
+    position: absolute;
+    top:207px;
+    left:0;
+    width:100%;
+}
+
+#registerArea .err{
+    top:263px;
+}
+
+#loginArea .err p, #registerArea .err p{
+    color:#f06b6b;
+    text-align: center;
 }
 
 #loginArea p, #registerArea p{
