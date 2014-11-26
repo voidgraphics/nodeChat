@@ -20,6 +20,7 @@ $(document).ready(function(){
 		//var atBottom = $('#chat').scrollTop() + $('#chat').innerHeight()>=$('#chat')[0].scrollHeight;
 		//if(atBottom){
 			$('#chat').animate({scrollTop: $('#chat > .inner').outerHeight()});
+
 		//}
 	}
 
@@ -49,21 +50,21 @@ $(document).ready(function(){
 	//  La méthode socket.on permet d'écouter un événement envoyé par le serveur. 
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
 	//  et une fonction à exécuter quand l'événement se déclenche en deuxième argument.
-	socket.on('new message', function(data){
+	socket.on('new message', function(message){
 		//  On check si l'auteur du message est dans la liste des gens bloqués, s'il ne l'est pas on affiche le message
-		if(muted.indexOf(data.author) == -1){
+		if(muted.indexOf(message._author) == -1){
 			
 			//  Le nom de l'user est en rouge pour se différencier des autres
-			if(data.author == username.val() && data.author != "Anonymous"){
-				data.author = '<span class="red">' + data.author + '</span>';
+			if(message._author == username.val() && message._author != "Anonymous"){
+				message._author = '<span class="red">' + message._author + '</span>';
 			}
 
 			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
-			chat.append('<div class="item">' + data.modSpan + data.adminSpan + '<span class="Author">' 
-					+ data.author + 
-					'&nbsp;:</span><span class="message"> ' 
-					+ data.message +
-					'</span><span class="time">'+ data.date.hours +':'+ data.date.minutes +'</span></div>');
+			chat.append('<div class="item">' + message.godSpan + '<span class="Author">' + 
+					message._author + 
+					'&nbsp;:</span><span class="message"> ' + 
+					message._content +
+					'</span><span class="time">'+ message.date.hours +':'+ message.date.minutes +'</span></div>');
 
 			//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
 			scroll();
@@ -74,7 +75,7 @@ $(document).ready(function(){
 	logoutButton.click(function(){
 		//  On envoie un event logout au serveur
 		socket.emit('logout', username.val());
-	})
+	});
 
 	//  Ecouteur qui supprime la valeur du champ caché quand le serveur répond avec la confirmation 'logged out'
 	socket.on('logged out', function(){
@@ -95,7 +96,7 @@ $(document).ready(function(){
 			var status = data[user].status=="online"?"":' <span class="status">(' + data[user].status + ')</span>';
 			html += '<li> ' + avatar + data[user].username + status + '</li>';
 			if(data[user].username == username.val()){
-				myAvatar = '<img src="http://www.gravatar.com/avatar/' + data[user].avatarHash + '?d=retro" alt="avatar" />'
+				myAvatar = '<img src="http://www.gravatar.com/avatar/' + data[user].avatarHash + '?d=retro" alt="avatar" />';
 				myStatus = data[user].status;
 			}
 		}
@@ -105,24 +106,24 @@ $(document).ready(function(){
 		$('.online h2').html('In the chat now (' + nbOnline + ')');
 	});
 
-	socket.on('whisper', function(data){
-		if(muted.indexOf(data.author) == -1){
-			chat.append('<div class="item whisper"><span class="Author">From '
-				+ data.author + 
-				'&nbsp;:</span><span class="message"> ' 
-				+ data.message +
-				'</span><span class="time">' 
-				+ data.date.hours +':'+ data.date.minutes +
+	socket.on('whisper', function(message){
+		if(muted.indexOf(message._author) == -1){
+			chat.append('<div class="item whisper"><span class="Author">From ' + 
+				message._author + 
+				'&nbsp;:</span><span class="message"> ' + 
+				message._content +
+				'</span><span class="time">' + 
+				message.date.hours +':'+ message.date.minutes +
 				'</span></div>');
 			scroll();
 		}
 	});
 
-	socket.on('whisper sent', function(data){
-		chat.append('<div class="item whisper"><span class="Author">To ' 
-			+ data.whisperTarget + '&nbsp;:</span><span class="message"> ' 
-			+ data.message +'</span><span class="time">' 
-			+ data.date.hours +':'+ data.date.minutes +
+	socket.on('whisper sent', function(message){
+		chat.append('<div class="item whisper"><span class="Author">To ' + 
+			message.whisperTarget + '&nbsp;:</span><span class="message"> ' + 
+			message._content +'</span><span class="time">' + 
+			message.date.hours +':'+ message.date.minutes +
 			'</span></div>');
 		scroll();
 	});
@@ -146,7 +147,7 @@ $(document).ready(function(){
 	});
 
 	socket.on('server message', function(message){
-		chat.append('<p class="serverMessage">' + message + '</p>');
+		chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + message + '</p>');
 	});
 
 	socket.on('allow', function(name){
@@ -159,5 +160,17 @@ $(document).ready(function(){
 		scroll();
 	});
 
-});
+	socket.on('kicked', function(){
+		$('#alertoverlay').fadeIn('slow');
+		$('#alert').html('You have been kicked out of the chat.');
+		$('#alert').fadeIn('slow');
+	});
 
+	socket.on('banned', function(){
+		$('#loginArea').hide();
+		$('#overlay').hide();
+		$('#alertoverlay').fadeIn('slow');
+		$('#alert').html('Your account was banned from the chat.');
+		$('#alert').fadeIn('slow');
+	});
+});
