@@ -4,13 +4,14 @@ var express = require('express'),
 	server = require('http').createServer(app),
 	io = require('socket.io').listen(server),
 	mysql = require('mysql'),
-	md5 = require('MD5');
+	User = require("./Classes/User.js"),
+	Message = require("./Classes/Message.js");
 //  On initialise le serveur node.js
 server.listen(3000);
 
 
 //  Routes ( fichiers )
-app.get('/chat', function(req, res){
+app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 app.get('/register', function(req, res){
@@ -30,17 +31,19 @@ var userList = {};
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
 
+	var user = new User();
+
 	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
 	updateUserList();
-	var isLogged = false;
 
 	//  Infos MySQL 
 	var connection = mysql.createConnection({
 		host: "127.0.0.1",
 		user: "root",
 		password: "root",
-		database: "Chat",
-		port: "8889"
+		database: "Chat", 
+		port: 8889
+		
 	});
 
 
@@ -50,7 +53,7 @@ io.sockets.on('connection', function(socket){
 
 	function offlineUser(){
 		//  On retire le nom de l'utilisateur du tableau online
-		delete onlineUsers[socket.username];
+		delete onlineUsers[user._username];
 		//  Puis on dit à tous les clients de mettre la liste à jour 
 		updateUserList();
 	}
@@ -59,155 +62,10 @@ io.sockets.on('connection', function(socket){
 		//  On vide la liste
 		userList = {};
 		//  Puis on ajoute les infos selon le modèle {username: blabla, status: blabla}
-		for(var user in onlineUsers){
-			userList[user] = {username: onlineUsers[user].username, status: onlineUsers[user].status, avatarHash: onlineUsers[user].avatarHash };
+		for(var usr in onlineUsers){
+			userList[usr] = {username: onlineUsers[usr].username, status: onlineUsers[usr].status, avatarHash: onlineUsers[usr].avatarHash };
 		}
 		io.sockets.emit('updateUsersList', userList);
-	}
-
-	function isSetCmd(message){
-		if(message.charAt(0) == "/")
-			return true;
-		else
-			return false;
-	}
-
-	function getCmd(string){
-		var ind = string.indexOf(" ");
-		if(ind == -1)
-			return string;
-		else 
-			var command = string.substr(0, ind);
-		return command;
-	}
-
-	function getName(string){
-		cmd = [];
-		cmd = string.split(" ", 2);
-		return cmd[1];
-	}
-
-	function getParam(string){
-		cmd = [];
-		cmd = string.split(" ", 3);
-		return cmd[2];
-	}
-
-	function executeCmd(data, callback){
-		var command = getCmd(data.message);
-		switch(command){
-			case "/w":
-				private = true;
-				var name = getName(data.message);
-				var message = data.message.replace(command, '').replace(name, '').trim();
-				//  Si l'utilisateur ciblé est bien en ligne
-				if(name in onlineUsers){
-					data.message = message;
-					date = new Date();
-					data.date = { hours: addZero(date.getHours()), minutes: addZero(date.getMinutes())};
-					//  On envoie un event whisper à son socket
-					onlineUsers[name].emit('whisper', data);
-					//  Et on envoie une confirmation de whisper au client
-					data.whisperTarget = name;
-					socket.emit('whisper sent', data);
-					console.log("Whisper from " + socket.username + " to " + name + ": " + message);
-				} 
-				else callback(name + ' is not online!');
-				break;
-			case "/red":
-				var message = data.message.replace(command, "").trim();
-				data.message = "<span class='red'>"+ message + "</span>";
-				break;
-			case "/b":
-				var message = data.message.replace(command, "").trim();
-				data.message = "<span class='bold'>"+ message + "</span>";
-				break;
-			case "/i":
-				var message = data.message.replace(command, "").trim();
-				data.message = "<span class='italic'>"+ message + "</span>";
-				break;
-			case "/mute":
-				private = true;
-				var name = getName(data.message);
-				if(name in onlineUsers)
-					socket.emit('mute', name);
-				else{
-					var errorMessage = name + " is not online";
-					socket.emit('server message', errorMessage);
-				}
-				break;
-			case "/allow":
-				private = true;
-				var name = getName(data.message);
-				socket.emit('allow', name);
-				break;
-			case "/muted":
-				private = true;
-				socket.emit('show muted');
-				break;	
-			case "/admin":
-				//  Sert seulement à tester si on a les droits d'admin ou pas
-				private = true;
-				var message
-				if(socket.authority >= 2){
-					message = "Admin command successful";
-				}
-				else  message = "You do not have the rights to use this command";
-				socket.emit('server message', message);
-				break;
-			case "/mod":
-				//  Sert seulement à tester si on a les droits de mod ou pas
-				private = true;
-				var message;
-				if(socket.authority >= 1){
-					message = "Moderator command successful";
-				}
-				else message = "You do not have the rights to use this command";
-				socket.emit('server message', message);
-				break;
-			case "/promote":
-				private = true;
-				var message;
-				if(socket.authority >= 2){
-					var name = getName(data.message);
-					var role = roleName = getParam(data.message);
-					if(role == "admin")
-						role = 2;
-					else if(role == "mod")
-						role = 1;
-					else if(role == "user")
-						role =  0;
-
-					var queryString = "UPDATE users SET authority='" + role + "' WHERE username='" + name + "';";
-					connection.query(queryString);
-					//  On check si l'user est en ligne pour mettre directement son autorité dans son socket,
-					//  Comme ça il doit pas se déco / reco pour profiter de ses nouveaux pouvoirs
-					if(name in onlineUsers)
-						onlineUsers[name].authority = role;
-					message = "Promoted " + name + " to " + roleName;
-				}
-				else message = "You do not have the rights to use this command";
-				socket.emit('server message', message);
-				break;
-			case "/away":
-				private = true;
-				onlineUsers[socket.username].status = "Away";
-				updateUserList();
-				console.log(socket.username + " is now away");
-				break;
-			case "/busy":
-				private = true;
-				onlineUsers[socket.username].status = "Busy";
-				updateUserList();
-				console.log(socket.username + " is now busy");
-				break;
-			case "/online":
-				private = true;
-				onlineUsers[socket.username].status = "online";
-				updateUserList();
-				console.log(socket.username + " is now online");
-				break;
-		}
 	}
 
 	function escapeHtml(string) {
@@ -217,17 +75,6 @@ io.sockets.on('connection', function(socket){
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
-	}
-
-	function addZero(i) {
-		if (i < 10) {
-			i = "0" + i;
-		}
-		return i;
-	}
-
-	function authSpan(){
-		
 	}
 
 	
@@ -240,28 +87,29 @@ io.sockets.on('connection', function(socket){
 	/**
 	*	Un utilisateur se connecte. 
 	**/
-	socket.on('login', function(user){
-		var username = escapeHtml(user.username);
-		var password = md5(user.password);
-		//  On vérifie si les infos reçues existent dans la BDD -> l'utilisateur existe / a correctement rentré son user/pass ?
-		var queryString = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "';";
-		connection.query(queryString, function(error, result){
-			//  Si le array retourné par MySQL est vide, alors il y a un problème, on envoie un event 'wrong info' au client
-			if(result.length == 0) socket.emit('wrong info');
-			else { 
-				//  Sinon c'est que tout va bien et on envoie un event 'logged in' au client
+	socket.on('login', function(info){
+
+		//  On vérifie les identifiants via la méthode login de notre objet user, puis on exécute le callback avec le résultat
+		user.login(info.username, info.password, connection, function(user){
+			//  Callback de user.login, on vérifie si on est bien connectés
+			if(user._connected === true){
 				socket.emit('logged in');
-				isLogged = true;
-				//  On stocke le nom d'utilisateur dans le socket (utile pour la déconnexion) et son autorité (null = user, 1 = modo, 2 = admin)
-				socket.username = username;
-				socket.authority = result[0].authority;
 				//  Puis on ajoute le nom en clé et le socket en valeur à l'objet des users connectés
-				onlineUsers[socket.username] = socket;
-				onlineUsers[socket.username].status = "online";
-				onlineUsers[socket.username].avatarHash = result[0].avatarHash;
+				onlineUsers[user._username] = socket;
+				onlineUsers[user._username].username = user._username;
+				onlineUsers[user._username].status = "online";
+				onlineUsers[user._username].authority = user._authority;
+				onlineUsers[user._username].avatarHash = user._avatarHash;
+				socket.broadcast.emit('server message', user._username + " has joined the chat.");  
 				//  Puis on rafraichit la liste de tous les utilisateurs.
 				updateUserList();
-				console.log(username + " has logged in to the chat");
+				console.log(user._username + " has logged in to the chat");
+			}
+			else{
+				if(user._banned === 1)
+					socket.emit('banned');
+				else
+					socket.emit('wrong info');
 			}
 		});
 	});
@@ -272,41 +120,23 @@ io.sockets.on('connection', function(socket){
 	socket.on('send message', function(data, callback){
 
 		private = false;
-		
-		data.message = escapeHtml(data.message);
-		//  Si il y a une commande, on l'exécute
-		if(isSetCmd(data.message)) executeCmd(data, callback);
+		var message = new Message(data);
+		if(message.isSetCmd()){
+			message.executeCmd(onlineUsers, user, io, connection);
+		}
 
 		//  Si le message n'est pas privé
 		if(!private){
+			//  On ajoute les détails et on l'enregistre
+			message.addGodIcon(onlineUsers[message._author]);
+			message.addDate();
+			message.save(connection);
 
-			var modSpan = "", adminSpan = "";
-			if(isLogged){	
-				var userAuth = onlineUsers[data.author].authority;
-				if (userAuth == 1)
-					modSpan = '<span class="modTag">*</span>';
-				if(userAuth > 1)
-					adminSpan = '<span class="adminTag">*</span>';
-			}
-			data.modSpan = modSpan;
-			data.adminSpan = adminSpan;
-
-			var clientDate = new Date();
-			data.date = new Date().toISOString().slice(0, 19).replace('T', ' ');		
-			//  On enregistre le message dans la BDD
-			var queryString = 'INSERT INTO messages (message_content, author, date) VALUES ("' +  data.message +'", "' + data.author + '", NOW());';
-			connection.query(queryString, function(error, results){
-				//  On affiche une erreur dans la console si il y a un soucis avec la requête
-				if(error) throw error;
-			});
-
-			data.date = { hours: addZero(clientDate.getHours()), minutes: addZero(clientDate.getMinutes())};
-
-			//  On envoie un event 'new message' avec le contenu du message à TOUS les clients connectés 
+			//  On envoie un event 'new message' avec le message en question à TOUS les clients connectés 
 			//  io.sockets.emit -> tous les clients connectés contrairement à
 			//  socket.emit -> uniquement le client qui a envoyé l'event originel
-			io.sockets.emit('new message', data);
-			console.log(data.author + ' sent a message : ' + data.message);
+			io.sockets.emit('new message', message);
+			console.log(message._author + ' sent a message : ' + message._content);
 		}
 	});
 
@@ -317,8 +147,8 @@ io.sockets.on('connection', function(socket){
 	socket.on('disconnect', function(data){
 		//  On ferme la connection à MySQL
 		connection.end();
-		//  Si la personne ne s'est pas login et donc n'a pas de nom d'utilisateur, on sort de la fonction
-		if(!socket.username) return;
+		//  Si la personne ne s'est pas login, on sort de la fonction
+		if(!user._connected) return;
 		//  Si on arrive jusqu'ici alors on a un username et on le retire du tableau
 		offlineUser();
 	});
@@ -338,30 +168,7 @@ io.sockets.on('connection', function(socket){
 	/**
 	*	Un utilisateur crée un nouveau compte
 	**/
-	socket.on('register', function(user){
-		var username = escapeHtml(user.username);
-		var password = md5(user.password);
-		var email = escapeHtml(user.email.trim());
-		var avatarHash = md5(email.toLowerCase());
-
-		//  On check si l'utilisateur existe déjà dans la BDD
-		var queryString = "SELECT * FROM users WHERE username = '" + username + "';";
-		connection.query(queryString, function(error, result){
-			//  Si on ne le trouve pas on l'ajoute
-			if(result.length == 0){	
-				queryString = 'INSERT INTO users (username, password, email, avatarHash) VALUES ("' +  username + '", "' + password + '", "' + email + '",  "' + avatarHash + '");';
-				connection.query(queryString, function(error, result){
-					//  Si qq chose foire on affiche l'erreur dans la console
-					if(error) throw error;
-					else {
-						//  Sinon on envoie un event 'account created' au client
-						socket.emit('account created');
-						console.log(username + " has created an account");
-					}
-				});
-			}
-			//  Sinon on renvoie une erreur
-			else console.log("There is already an account called " + username + ". Please choose another one.");	   
-		});
+	socket.on('register', function(data){
+		user.register(connection, socket, data);
 	});
 });
