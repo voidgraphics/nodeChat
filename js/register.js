@@ -12,6 +12,7 @@ $(document).ready(function(){
 	function showRegisterForm(){
 		registerForm.fadeIn("slow");
 		$('#regoverlay').fadeIn("slow");
+		username.focus();
 		//  Ecouteur (trouvé sur le net ^^') qui permet de cacher le formulaire si on clique en dehors de celui-ci
 		$(document).mouseup(function (e){
 		   	if (!registerForm.is(e.target) //  if the target of the click isn't the container...
@@ -49,6 +50,10 @@ $(document).ready(function(){
 	//  On prévient l'user et on le redirige (attention, on le redirige sur la route, pas sur le fichier lui-même)
 	socket.on('account created', function(){
 		alert("account created!");
-		window.location = '/chat';
+		window.location = '/';
+	});
+
+	socket.on('account exists', function(){
+		$("#registerArea .err").html('<p id="error" class="error">This account already exists</p>');
 	});
 });

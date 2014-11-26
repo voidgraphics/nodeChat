@@ -15,6 +15,7 @@ $(document).ready(function(){
 	function showLoginForm(){
 		loginForm.fadeIn("slow");
 		$('#overlay').fadeIn("slow");
+		username.focus();
 		//  Ecouteur (trouvé sur le net ^^') qui permet de cacher le formulaire si on clique en dehors de celui-ci
 		$(document).mouseup(function (e){
 		   	if (!loginForm.is(e.target) //  if the target of the click isn't the container...
@@ -50,10 +51,11 @@ $(document).ready(function(){
 		//  Si les infos sont correctes, le serveur envoie un event 'logged in'. 
 		//  On retire les erreurs si il y en a, puis on cache le formulaire, on met le nom de l'auteur dans le champ caché et on change les boutons
 		socket.on('logged in', function(){
-			if(error == 1) $('#error').remove();
+			if(error == 1) $('#error.error').remove();
 			error = 0;
 			loginForm.fadeOut("slow");
 			$('#overlay').fadeOut("slow");
+			username.focus();
 			$('#username').val(username.val());
 			$('.anon').hide();
 			$('.logged').show();
@@ -62,7 +64,7 @@ $(document).ready(function(){
 
 		//  Sinon on affiche une erreur
 		socket.on('wrong info', function(){
-			loginForm.append('<p id="error" class="error">Wrong username / password</p>');
+			$("#loginArea .err").html('<p id="error" class="error">Wrong username / password</p>');
 			error = 1;
 		});
 	});
