@@ -16,6 +16,24 @@ method.save = function(connection){
 	});
 };
 
+method.highlightLinks = function(){
+	var replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+	//URLs starting with http://, https://, or ftp://
+	replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+	replacedText = this._content.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+	//URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+	replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+	replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+	//Change email addresses to mailto:: links.
+	replacePattern3 = /(\w+@[a-zA-Z_]+?(\.[a-zA-Z]{2,6})+)/gim;
+	replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+	this._content = replacedText;
+}
+
 //  Fonction qui vérifie si le message est une commande
 method.isSetCmd = function(){
 	if(this._content.charAt(0) == "/")
@@ -173,6 +191,18 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			onlineUsers[user._username].status = "online";
 			updateUserList(onlineUsers, io);
 			console.log(user._username + " is now online");
+			break;
+
+		case "/status":  //  Permet de spécifier un statut customisé. Utilisation :  /status statut
+			private = true;
+			var status = this.getName();
+			if(status.length > 10)
+				user._socket.emit('server message', "Your status can not be longer than 10 characters. (Yours was " + status.length +")");
+			else {
+				onlineUsers[user._username].status = status;
+				updateUserList(onlineUsers, io);
+				console.log(user._username + " is now " + status);
+			}
 			break;
 			
 		case "/slap":  //  Donne une gifle à une cible. Utilisation:  /slap cible
