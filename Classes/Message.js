@@ -113,18 +113,18 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			if(name in onlineUsers)
 				onlineUsers[user._username].emit('mute', name);
 			else
-				onlineUsers[user._username].emit('server message', name + " is not online!");
+				user._socket.emit('server message', name + " is not online!");
 			break;
 
 		case "/allow": 	//  Annule les effets de /mute. Utilisation:  /allow cible
 			private = true;
 			var name = this.getName();
-			onlineUsers[user._username].emit('allow', name);
+			user._socket.emit('allow', name);
 			break;
 
 		case "/muted":  //  Affiche la liste des utilisateurs bloqués par /mute. Utilisation:  /muted
 			private = true;
-			onlineUsers[user._username].emit('show muted');
+			user._socket.emit('show muted');
 			break;
 
 		case "/admin":  //  Sert seulement à tester si on a les droits d'admin ou pas. Utilisation:  /admin
@@ -134,7 +134,7 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 				msg = "Admin command successful";
 			}
 			else  msg = "You do not have the rights to use this command";
-			onlineUsers[user._username].emit('server message', msg);
+			user._socket.emit('server message', msg);
 			break;
 
 		case "/mod":  //  Sert seulement à tester si on a les droits de modérateur ou pas. Utilisation:  /mod
@@ -144,7 +144,7 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 				msg = "Moderator command successful";
 			}
 			else msg = "You do not have the rights to use this command";
-			onlineUsers[user._username].emit('server message', msg);
+			user._socket.emit('server message', msg);
 			break;
 
 		case "/promote":  //  Change les permissions d'un utilisateur (admin, mod, user). Utilisation:  /promote cible role
@@ -169,39 +169,47 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 				msg = "Promoted " + name + " to " + roleName;
 			}
 			else msg = "You do not have the rights to use this command";
-			onlineUsers[user._username].emit('server message', msg);
+			user._socket.emit('server message', msg);
 			break;
 
 		case "/away":  //  Fait passer le statut à Away. Utilisation:  /away
 			private = true;
-			onlineUsers[user._username].status = "Away";
-			updateUserList(onlineUsers, io);
-			console.log(user._username + " is now away");
+			if(user._username in onlineUsers){
+				onlineUsers[user._username].status = "Away";
+				updateUserList(onlineUsers, io);
+				console.log(user._username + " is now away");
+			}
 			break;
 
 		case "/busy":  //  Fait passer le statut à Busy. Utilisation:  /busy
 			private = true;
-			onlineUsers[user._username].status = "Busy";
-			updateUserList(onlineUsers, io);
-			console.log(user._username + " is now busy");
+			if(user._username in onlineUsers){	
+				onlineUsers[user._username].status = "Busy";
+				updateUserList(onlineUsers, io);
+				console.log(user._username + " is now busy");
+			}
 			break;
 
 		case "/online":  //  Fait passer le statut à Online. Utilisation:  /online
 			private = true;
-			onlineUsers[user._username].status = "online";
-			updateUserList(onlineUsers, io);
-			console.log(user._username + " is now online");
+			if(user._username in onlineUsers){
+				onlineUsers[user._username].status = "online";
+				updateUserList(onlineUsers, io);
+				console.log(user._username + " is now online");
+			}
 			break;
 
 		case "/status":  //  Permet de spécifier un statut customisé. Utilisation :  /status statut
 			private = true;
 			var status = this.getName();
-			if(status.length > 10)
-				user._socket.emit('server message', "Your status can not be longer than 10 characters. (Yours was " + status.length +")");
-			else {
-				onlineUsers[user._username].status = status;
-				updateUserList(onlineUsers, io);
-				console.log(user._username + " is now " + status);
+			if(user._username in onlineUsers){	
+				if(status.length > 10)
+					user._socket.emit('server message', "Your status can not be longer than 10 characters. (Yours was " + status.length +")");
+				else {
+					onlineUsers[user._username].status = status;
+					updateUserList(onlineUsers, io);
+					console.log(user._username + " is now " + status);
+				}
 			}
 			break;
 			
