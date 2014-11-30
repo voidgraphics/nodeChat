@@ -9,7 +9,6 @@
         <title>Chatroom!</title>
         <meta name="description" content="Chatroom">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <link href='http://fonts.googleapis.com/css?family=Open+Sans:600italic,600,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/main.css">
@@ -18,10 +17,12 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
+
         <div id="alert"></div>
         <div id="alertoverlay"></div>
 
         <!-- Formulaire pour se connecter, caché par défaut jusqu'au click sur le bouton login -->
+
         <form action="#" id="loginArea" method="post"> 
             <h2>Log in</h2>
             <div class="err"></div> 
@@ -31,7 +32,9 @@
             <p>Don't have an account? <a href='#' class='register'>Register</a></p>
         </form>
         <div id="overlay"></div>
+
         <!-- Formulaire pour créer un compte, caché par défaut jusqu'au click sur le bouton register -->
+
         <form action="#" id="registerArea" method="post"> 
             <h2>Register</h2>
             <div class="err"></div>
@@ -42,28 +45,30 @@
             <p>Already have an account? <a href='#' class='login'>Log in</a></p>
         </form>
         <div id="regoverlay"></div>
+
+        <!-- Sidebar -->
+
         <div class="sidebar">
-        <div class="anon">
-            <p>Welcome</p>
-            <a href='#loginArea' id="loginButton" class='button login'>Log in</a>
-            <a href='#registerArea' id="registerButton" class='button register'>Register</a>
-            <p>Or chat anonymously</p>
-        </div>
-        <div class="logged">
-            <div class="head">
-                <p>Logged as: <span class="username"></span></p>
-                <p class="status">Currently <span>online</span></p>
-                <div class="avatarArea">
-                    <img src="http://www.gravatar.com/avatar/aaa?d=retro" alt="avatar" />
-                </div>
+            <div class="anon">
+                <p>Welcome</p>
+                <a href='#loginArea' id="loginButton" class='button login'>Log in</a>
+                <a href='#registerArea' id="registerButton" class='button register'>Register</a>
+                <p>Or chat anonymously</p>
             </div>
-            <ul>
-                <li><a href="www.gravatar.com">Change profile picture</a></li>
-                <li><a href="#">view list of chat commands</a></li>
-                <li><a href='#' id="logoutButton" >Logout</a></li>
-            </ul>
-        </div>
-            <hr />
+            <div class="logged">
+                <div class="head">
+                    <p>Logged as: <span class="username"></span></p>
+                    <p class="status">Currently <span>online</span></p>
+                    <div class="avatarArea">
+                        <img src="http://www.gravatar.com/avatar/aaa?d=retro" alt="avatar" />
+                    </div>
+                </div>
+                <ul>
+                    <li><a href="www.gravatar.com">Change profile picture</a></li>
+                    <li><a href="#">view list of chat commands</a></li>
+                    <li><a href='#' id="logoutButton" >Logout</a></li>
+                </ul>
+            </div>
             <div class="online">
                 <h2>In the chat now</h2>
                 <ul id="onlineUsers">
@@ -71,19 +76,20 @@
                 </ul>
             </div>
         </div>
-        <!-- Module online -->
+
         <!-- Conteneur du chat -->
+
         <div id="chat">
-            <div class="inner">
+            <div id="inner" class="inner">
                 
             </div>
-        <form id="inputArea" method="post">
-            <div>
-                <textarea name="message" id="messageInput" cols="30" rows="1" autofocus placeholder="Type your message..." ></textarea>
-                <input type="hidden" id="username" name="username" value="Anonymous">
-                <input type="submit" value="Send" id="messageSubmit" />
-            </div>
-        </form>
+            <form id="inputArea" method="post">
+                <div>
+                    <textarea name="message" id="messageInput" cols="30" rows="1" autofocus placeholder="Type your message..." ></textarea>
+                    <input type="hidden" id="username" name="username" value="Anonymous">
+                    <input type="submit" value="Send" id="messageSubmit" />
+                </div>
+            </form>
         </div>
 
         <!-- Zone pour envoyer des messages -->
