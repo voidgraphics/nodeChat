@@ -10,18 +10,28 @@ $(document).ready(function(){
 	logoutButton = $('#logoutButton'),
 	onlineUsers = $('#onlineUsers'),
 	muted = [];
-	chat = $('#chat > .inner');
+	chat = $('#chat > .inner'),
+	atBottom = true;
 
 	//  On scrolle tout en bas de la div pour afficher le message le plus récent
 	$("#chat").scrollTop($("#chat")[0].scrollHeight);
 
-	function scroll(){
-		//  bug pour le moment
-		//var atBottom = $('#chat').scrollTop() + $('#chat').innerHeight()>=$('#chat')[0].scrollHeight;
-		//if(atBottom){
-			$('#chat').animate({scrollTop: $('#chat > .inner').outerHeight()});
+	function checkScroll(){
+		$('#inner').bind('scroll', function() {
+		    if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {
+		    	atBottom = true;
+		    }
+		    else{
+		    	atBottom = false;
+		    }
+		});
+	}
 
-		//}
+	function scroll(atBottom){
+		if(atBottom === true){
+			var chat_div = document.getElementById('inner');
+			chat_div.scrollTop = chat_div.scrollHeight;
+		}
 	}
 
 	//  Ecouteur qui permet de soumettre le formulaire quand on appuie sur Enter alors qu'on se trouve dans un textarea
@@ -59,6 +69,8 @@ $(document).ready(function(){
 				message._author = '<span class="red">' + message._author + '</span>';
 			}
 
+			checkScroll();
+
 			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
 			chat.append('<div class="item">' + message.godSpan + '<span class="Author">' + 
 					message._author + 
@@ -67,7 +79,7 @@ $(document).ready(function(){
 					'</span><span class="time">'+ message.date.hours +':'+ message.date.minutes +'</span></div>');
 
 			//  On scrolle pour afficher le nouveau message si on est déjà en bas de la page. NOTE: bug, ne fonctionne plus après x messages
-			scroll();
+			scroll(atBottom);
 		}
 	});
 
