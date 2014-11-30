@@ -4,14 +4,15 @@ var 	mysql = require('mysql'),
 var method = User.prototype;
 
 //  Définition de la classe User
-function User(){
+function User(socket){
+	this._socket = socket;
 	this._username = "Anonymous";
 	this._authority = 0;
 	this._connected = false;
 }
 
 //  Fonction qui permet de se connecter
-method.login = function(user, pass, connection, callback){
+method.login = function(user, pass, connection, onlineUsers, callback){
 	var username = escapeHtml(user);
 	var password = md5(pass);
 	//  On sauve la valeur de this pour pouvoir l'utiliser dans le callback de connection.query (sinon this représente la fonction callback au lieu de l'instance de User)
@@ -26,18 +27,26 @@ method.login = function(user, pass, connection, callback){
 				that._banned = 1;
 			}
 			else{
-			that._connected = true;
-			that._username = username;
-			that._authority = result[0].authority;
-			that._avatarHash = result[0].avatarHash;
-				
+				that._socket.emit('logged in');
+				that._connected = true;
+				that._username = username;
+				that._authority = result[0].authority;
+				that._avatarHash = result[0].avatarHash;
+				//  Puis on ajoute le nom en clé et le socket en valeur à l'objet des users connectés
+				onlineUsers[that._username] = that._socket;
+				onlineUsers[that._username].username = that._username;
+				onlineUsers[that._username].status = "online";
+				onlineUsers[that._username].authority = that._authority;
+				onlineUsers[that._username].avatarHash = that._avatarHash;			
+				that._socket.broadcast.emit('server message', that._username + " has joined the chat."); 
+				console.log(that._username + " has logged in to the chat");
 			}
 		}
 		callback(that);
 	});
 };
 
-method.register = function(connection, socket, data){
+method.register = function(connection, data){
 	var username = escapeHtml(data.username);
 	var password = md5(data.password);
 	var email = escapeHtml(data.email.trim());
@@ -54,13 +63,13 @@ method.register = function(connection, socket, data){
 				if(error) throw error;
 				else {
 					//  Sinon on envoie un event 'account created' au client
-					socket.emit('account created');
+					this._socket.emit('account created');
 					console.log(username + " has created an account");
 				}
 			});
 		}
 		//  Sinon on renvoie une erreur
-		else socket.emit('account exists');
+		else this._socket.emit('account exists');
 	}); 
 };
 

@@ -31,7 +31,7 @@ var userList = {};
 //  Quand un utilisateur charge la page ('connection' est un event prédéfini par socket.io)
 io.sockets.on('connection', function(socket){
 
-	var user = new User();
+	var user = new User(socket);
 
 	//  Lorsque l'utilisateur arrive sur la page de chat, on affiche la liste des personnes connectées.
 	updateUserList();
@@ -90,20 +90,11 @@ io.sockets.on('connection', function(socket){
 	socket.on('login', function(info){
 
 		//  On vérifie les identifiants via la méthode login de notre objet user, puis on exécute le callback avec le résultat
-		user.login(info.username, info.password, connection, function(user){
+		user.login(info.username, info.password, connection, onlineUsers, function(user){
 			//  Callback de user.login, on vérifie si on est bien connectés
 			if(user._connected === true){
-				socket.emit('logged in');
-				//  Puis on ajoute le nom en clé et le socket en valeur à l'objet des users connectés
-				onlineUsers[user._username] = socket;
-				onlineUsers[user._username].username = user._username;
-				onlineUsers[user._username].status = "online";
-				onlineUsers[user._username].authority = user._authority;
-				onlineUsers[user._username].avatarHash = user._avatarHash;
-				socket.broadcast.emit('server message', user._username + " has joined the chat.");  
 				//  Puis on rafraichit la liste de tous les utilisateurs.
 				updateUserList();
-				console.log(user._username + " has logged in to the chat");
 			}
 			else{
 				if(user._banned === 1)
@@ -131,7 +122,7 @@ io.sockets.on('connection', function(socket){
 			message.addGodIcon(onlineUsers[message._author]);
 			message.addDate();
 			message.save(connection);
-
+			message.highlightLinks();
 			//  On envoie un event 'new message' avec le message en question à TOUS les clients connectés 
 			//  io.sockets.emit -> tous les clients connectés contrairement à
 			//  socket.emit -> uniquement le client qui a envoyé l'event originel
@@ -169,6 +160,6 @@ io.sockets.on('connection', function(socket){
 	*	Un utilisateur crée un nouveau compte
 	**/
 	socket.on('register', function(data){
-		user.register(connection, socket, data);
+		user.register(connection,  data);
 	});
 });
