@@ -41,6 +41,12 @@ les `id` sont des INT en auto_increment et clé primaire, le `message_content` e
 - ~~Design plus propre~~ // FAIT
 - ~~Statuts~~ // FAIT
 - ~~Gravatars~~ // FAIT
+- Liste des commandes pour chaque utilisateur
+- Antispam
+- Ban par IP
+- Messages groupés par utilisateurs
+- ~~Liens cliquables~~ // FAIT
+- Rooms
 - Emotes  
 - ~~Système de messagerie privée / whispers~~  // FAIT
 - ~~Commandes en tout genre~~ // FAIT
