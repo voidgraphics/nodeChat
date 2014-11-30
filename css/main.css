@@ -99,7 +99,7 @@ textarea {
 
 
 body{
-    background-color: #eee;
+    background-color: #f3f3f3;
     font-family: 'Open Sans';
     font-weight: 600;
     font-size: 11px;
@@ -222,6 +222,12 @@ body{
  *  ANONYMOUS
  */
 
+.anon{
+    padding-top: 1px;
+    padding-bottom: 1px;
+    background-color: #232323;
+}
+
 .sidebar p{
     text-align: center;
     margin:31px 0;
@@ -253,7 +259,7 @@ body{
  *  LOGGED IN
  */
 
- .logged{
+.logged{
     display:none;
  }
 
@@ -355,6 +361,8 @@ ul#onlineUsers .status{
 
 .inner{
     position: absolute;
+    overflow:auto;
+    height:calc(100% - 100px);
     bottom: 80px;
     width: calc(100% - 290px);
 }
@@ -382,6 +390,14 @@ ul#onlineUsers .status{
     position: relative;
 }
 
+.item a{
+    color: #f06b6b;
+}
+
+.item a:hover{
+    color: #c65858;
+}
+
 .item.whisper{
     background-color: #474747;
     font-style: italic;
@@ -397,7 +413,7 @@ ul#onlineUsers .status{
 
 .item .message{
     color:#8b8b8b;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
 }
 
 .item.whisper .message{
@@ -419,7 +435,7 @@ ul#onlineUsers .status{
 #messageInput{
     font-family: 'Open Sans';
     font-weight: 600;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     background-color: #fff;
     padding: 17px 20px 16px 20px;
     margin: 22px 40px;
