@@ -70,7 +70,7 @@ method.register = function(connection, data){
 			});
 		}
 		//  Sinon on renvoie une erreur
-		else this._socket.emit('account exists');
+		else that._socket.emit('account exists');
 	}); 
 };
 
