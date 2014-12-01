@@ -51,7 +51,7 @@ method.register = function(connection, data){
 	var password = md5(data.password);
 	var email = escapeHtml(data.email.trim());
 	var avatarHash = md5(email.toLowerCase());
-	that = this
+	that = this;
 
 	//  On check si l'utilisateur existe déjà dans la BDD
 	var queryString = "SELECT * FROM users WHERE username = '" + username + "';";
