@@ -51,6 +51,7 @@ method.register = function(connection, data){
 	var password = md5(data.password);
 	var email = escapeHtml(data.email.trim());
 	var avatarHash = md5(email.toLowerCase());
+	that = this
 
 	//  On check si l'utilisateur existe déjà dans la BDD
 	var queryString = "SELECT * FROM users WHERE username = '" + username + "';";
@@ -63,7 +64,7 @@ method.register = function(connection, data){
 				if(error) throw error;
 				else {
 					//  Sinon on envoie un event 'account created' au client
-					this._socket.emit('account created');
+					that._socket.emit('account created');
 					console.log(username + " has created an account");
 				}
 			});
