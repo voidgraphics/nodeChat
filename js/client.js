@@ -120,6 +120,7 @@ $(document).ready(function(){
 
 	socket.on('whisper', function(message){
 		if(muted.indexOf(message._author) == -1){
+			checkScroll();
 			chat.append('<div class="item whisper"><span class="Author">From ' + 
 				message._author + 
 				'&nbsp;:</span><span class="message"> ' + 
@@ -127,49 +128,56 @@ $(document).ready(function(){
 				'</span><span class="time">' + 
 				message.date.hours +':'+ message.date.minutes +
 				'</span></div>');
-			scroll();
+			scroll(atBottom);
 		}
 	});
 
 	socket.on('whisper sent', function(message){
+		checkScroll();
 		chat.append('<div class="item whisper"><span class="Author">To ' + 
 			message.whisperTarget + '&nbsp;:</span><span class="message"> ' + 
 			message._content +'</span><span class="time">' + 
 			message.date.hours +':'+ message.date.minutes +
 			'</span></div>');
-		scroll();
+		scroll(atBottom);
 	});
 
 	socket.on('mute', function(name){
+		checkScroll();
 		if(muted.indexOf(name) != -1){
-			chat.append('<p class="serverMessage">' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
 		} else {
 			muted.push(name);
-			chat.append('<p class="serverMessage">' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
 		}
-		scroll();
+		scroll(atBottom);
 	});
 
 	socket.on('show muted', function(){
+		checkScroll();
 		if(muted.length > 0){
-			html = '<p class="serverMessage">Currently muted: ' + muted + '</p>';
+			html = '<p class="serverMessage"><span class="red">»&nbsp;</span>Currently muted: ' + muted + '</p>';
 		} else 
-			html = '<p class="serverMessage">Nobody is muted.</p>';
-		chat.append(html);	
+			html = '<p class="serverMessage"><span class="red">»&nbsp;</span>Nobody is muted.</p>';
+		chat.append(html);
+		scroll(atBottom);
 	});
 
 	socket.on('server message', function(message){
+		checkScroll();
 		chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + message + '</p>');
+		scroll(atBottom);
 	});
 
 	socket.on('allow', function(name){
+		checkScroll();
 		if(muted.indexOf(name) != -1){
 			muted.splice(muted.indexOf(name), 1);
-			chat.append('<p class="serverMessage">You will now see messages from ' + name + ' again.</p>');
+			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>You will now see messages from ' + name + ' again.</p>');
 		} else {
-			chat.append('<p class="serverMessage">' + name + ' is not currently muted.</p>');
+			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is not currently muted.</p>');
 		}
-		scroll();
+		scroll(atBottom);
 	});
 
 	socket.on('kicked', function(){
