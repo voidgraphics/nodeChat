@@ -13,7 +13,8 @@ $(document).ready(function(){
 	onlineUsers = $('#onlineUsers'),
 	muted = [];
 	chat = $('#chat > .inner'),
-	atBottom = true;
+	atBottom = true,
+	nb = 0;
 
 	//  On scrolle tout en bas de la div pour afficher le message le plus récent
 	$("#chat").scrollTop($("#chat")[0].scrollHeight);
@@ -27,6 +28,16 @@ $(document).ready(function(){
 		    	atBottom = false;
 		    }
 		});
+	}
+
+	function addNotification(){
+		nb++;
+		$('head title').html('Chat (' + nb + ')');
+	}
+
+	function removeNotification(){
+		nb = 0;
+		$('head title').html('Chat');
 	}
 
 	function scroll(atBottom){
@@ -69,6 +80,11 @@ $(document).ready(function(){
 		antispamBefore = antispam;
 	});
 
+	$(window).on('focus', function(){
+		checkScroll();
+		if(atBottom === true)
+			removeNotification();
+	});
 	
 	//  La méthode socket.on permet d'écouter un événement envoyé par le serveur. 
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
@@ -83,6 +99,11 @@ $(document).ready(function(){
 			}
 
 			checkScroll();
+
+			if(atBottom === false || document.hidden === true)
+				addNotification();
+			else
+				removeNotification();
 
 			//  Ensuite on insère simplement le html formaté avec les informations provenant du serveur
 			chat.append('<div class="item">' + message.godSpan + '<span class="Author">' + 
