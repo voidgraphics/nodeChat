@@ -42,7 +42,7 @@ les `id` sont des INT en auto_increment et clé primaire, le `message_content` e
 - ~~Statuts~~ // FAIT
 - ~~Gravatars~~ // FAIT
 - Liste des commandes pour chaque utilisateur
-- Antispam
+- ~~Antispam~~ // FAIT
 - Ban par IP
 - Messages groupés par utilisateurs
 - ~~Liens cliquables~~ // FAIT
