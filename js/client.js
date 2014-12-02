@@ -2,6 +2,8 @@ $(document).ready(function(){
 
 	//  On initialise la connection à socket
 	var socket = io.connect();
+	var antispamBefore = new Date();
+	antispamBefore = Date.parse(antispamBefore);
 
 	//  On récupère les éléments dont on aura besoin dans le script
 	var messageForm = $('#inputArea'),
@@ -45,15 +47,26 @@ $(document).ready(function(){
 	//  Ecouteur qui envoie le message lorsque le formulaire est soumis (soit en cliquant sur Send soit en appuyant sur Enter)
 	messageForm.submit(function(e){
 		e.preventDefault();
-		//  La méthode socket.emit envoie un événement au serveur. 
-		//  On précise le nom de l'événement en premier argument, et un objet avec les infos à passer en 2e argument.
-		socket.emit('send message', { "message" : messageBox.val(), "author" : username.val() }, function(data){
-			//  Callback en cas d'erreur
-			chat.append('<div class="item error"><p>'+ data +'</p></div>');
-		});
-		//  On remet le focus dans le textarea et on le vide
-		messageBox.focus();
-		messageBox.val('');
+
+		var antispam = new Date();
+		antispam = Date.parse(antispam);
+		if(antispam > antispamBefore + 1000){
+			//  La méthode socket.emit envoie un événement au serveur. 
+			//  On précise le nom de l'événement en premier argument, et un objet avec les infos à passer en 2e argument.
+			socket.emit('send message', { "message" : messageBox.val(), "author" : username.val() }, function(data){
+				//  Callback en cas d'erreur
+				chat.append('<div class="item error"><p>'+ data +'</p></div>');
+			});
+			//  On remet le focus dans le textarea et on le vide
+			messageBox.focus();
+			messageBox.val('');
+		}
+		else {
+			checkScroll();
+			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>Slow down!</p>');
+			scroll(atBottom);
+		}
+		antispamBefore = antispam;
 	});
 
 	
