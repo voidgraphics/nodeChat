@@ -44,6 +44,8 @@ les `id` sont des INT en auto_increment et clé primaire, le `message_content` e
 - Liste des commandes pour chaque utilisateur
 - ~~Antispam~~ // FAIT
 - Ban par IP
+- Suppression de messages
+- Shoutout (@user)
 - Messages groupés par utilisateurs
 - ~~Liens cliquables~~ // FAIT
 - Rooms
