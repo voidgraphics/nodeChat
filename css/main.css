@@ -446,6 +446,10 @@ ul#onlineUsers .status{
     border:none;
 }
 
+input:focus, textarea:focus{
+    outline:0;
+}
+
 #messageSubmit{
     background: #fff;
     color:#747474;
