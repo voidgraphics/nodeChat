@@ -16,6 +16,7 @@ method.save = function(connection){
 	});
 };
 
+//  Fonction qui remplace les liens par des liens cliquables
 method.highlightLinks = function(){
 	var replacedText, replacePattern1, replacePattern2, replacePattern3;
 
@@ -35,7 +36,7 @@ method.highlightLinks = function(){
 }
 
 //  Fonction qui vérifie si le message est une commande
-method.isSetCmd = function(){
+method.hasCmd = function(){
 	if(this._content.charAt(0) == "/")
 		return true;
 	else
@@ -261,7 +262,6 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			break;
 	}
 };
-
 
 //  Fonction qui retourne le premier paramètre (nom) d'une commande. Ex: "/w Void hello" retourne Void
 method.getName = function(){

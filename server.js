@@ -110,11 +110,15 @@ io.sockets.on('connection', function(socket){
 	**/
 	socket.on('send message', function(data, callback){
 
+		//  Par défaut, un message n'est pas privé -> Il sera visible par tout le monde.
+		//  Certaines commandes peuvent spécifier private = true, 
+		//  dans ce cas le message ne sera pas transmis publiquement ni enregistré dans la BDD.
 		private = false;
+
 		var message = new Message(data);
-		if(message.isSetCmd()){
+
+		if(message.hasCmd())
 			message.executeCmd(onlineUsers, user, io, connection);
-		}
 
 		//  Si le message n'est pas privé
 		if(!private){
@@ -139,7 +143,7 @@ io.sockets.on('connection', function(socket){
 		//  On ferme la connection à MySQL
 		connection.end();
 		//  Si la personne ne s'est pas login, on sort de la fonction
-		if(!user._connected) return;
+		if(user._connected === false) return;
 		//  Si on arrive jusqu'ici alors on a un username et on le retire du tableau
 		offlineUser();
 	});
