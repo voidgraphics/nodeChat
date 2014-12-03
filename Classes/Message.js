@@ -216,14 +216,14 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			
 		case "/slap":  //  Donne une gifle à une cible. Utilisation:  /slap cible
 			private = true;
-			var name = this.getName();
+			var name = this._content.replace(command, '').trim();
 			var msg = this._author + " slaps " + name + " in the face with a big slippery fish!";
 			io.sockets.emit('server message', msg);
 			break;
 
 		case "/kick":  //  Expulse un utilisateur du chat. Utilisation:  /kick cible
-			private = true;
 			if(user._authority >= 1){
+				private = true;
 				var name = this.getName();
 				if(name in onlineUsers){
 					onlineUsers[name].emit('kicked');
@@ -234,8 +234,8 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			break;
 
 		case "/ban":  //  Banni la cible. Utilisation:  /ban cible
-			private = true;
 			if(user._authority >=1){
+				private = true;
 				var name = this.getName();
 				var queryString = 'UPDATE users SET banned=1 WHERE username="' + name + '";';
 				connection.query(queryString, function(error, results){
@@ -250,14 +250,21 @@ method.executeCmd = function(onlineUsers, user, io, connection){
 			break;
 
 		case "/unban":  //  Supprime un ban. Utilisation:  /unban cible
-			private = true;
 			if(user._authority >= 1){
+				private = true;
 				var name = this.getName();
 				var queryString = 'UPDATE users SET banned=0 WHERE username="' + name + '";';
 				connection.query(queryString, function(error, results){
 					if(error) throw error;
 				});
 				io.sockets.emit('server message', name + ' was unbanned from the chat.');
+			}
+			break;
+
+		case "/clear":  //  Efface tout les messages, pour tout le monde. Utilisation:  /clear
+			if(user._authority >=1){
+				private = true;
+				io.sockets.emit('clear');
 			}
 			break;
 	}
@@ -282,9 +289,9 @@ method.addGodIcon = function(loggedUser){
 	var godSpan = "";
 	if(loggedUser){
 		if(loggedUser.authority == 1)
-			godSpan = '<span class="modTag">*</span>';
+			godSpan = '<span class="modTag" title="Moderator">*</span>';
 		if(loggedUser.authority > 1)
-			godSpan = '<span class="adminTag">*</span>';
+			godSpan = '<span class="adminTag" title="Administrator">*</span>';
 	}
 	this.godSpan = godSpan;
 };
