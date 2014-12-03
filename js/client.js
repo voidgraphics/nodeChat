@@ -2,50 +2,24 @@ $(document).ready(function(){
 
 	//  On initialise la connection à socket
 	var socket = io.connect();
-	var antispamBefore = new Date();
-	antispamBefore = Date.parse(antispamBefore);
 
-	//  On récupère les éléments dont on aura besoin dans le script
+	//  On récupère les éléments et on crée les variables dont on aura besoin dans le script
 	var messageForm = $('#inputArea'),
 	username = $('#username'),
 	messageBox = $('#messageInput'),
 	logoutButton = $('#logoutButton'),
 	onlineUsers = $('#onlineUsers'),
+	cmdButton = $('#showCmdButton'),
 	muted = [];
 	chat = $('#chat > .inner'),
 	atBottom = true,
-	nb = 0;
+	nbNotifs = 0,
+	antispamBefore = Date.parse(new Date());
 
-	//  On scrolle tout en bas de la div pour afficher le message le plus récent
-	$("#chat").scrollTop($("#chat")[0].scrollHeight);
 
-	function checkScroll(){
-		$('#inner').bind('scroll', function() {
-		    if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {
-		    	atBottom = true;
-		    }
-		    else{
-		    	atBottom = false;
-		    }
-		});
-	}
-
-	function addNotification(){
-		nb++;
-		$('head title').html('Chat (' + nb + ')');
-	}
-
-	function removeNotification(){
-		nb = 0;
-		$('head title').html('Chat');
-	}
-
-	function scroll(atBottom){
-		if(atBottom === true){
-			var chat_div = document.getElementById('inner');
-			chat_div.scrollTop = chat_div.scrollHeight;
-		}
-	}
+	/*
+	 *	Ecouteurs d'événement
+	 */
 
 	//  Ecouteur qui permet de soumettre le formulaire quand on appuie sur Enter alors qu'on se trouve dans un textarea
 	messageBox.keypress(function(e){
@@ -74,18 +48,25 @@ $(document).ready(function(){
 		}
 		else {
 			checkScroll();
-			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>Slow down!</p>');
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>Slow down!</p>');
 			scroll(atBottom);
 		}
 		antispamBefore = antispam;
 	});
 
+	//  Ecouteur qui supprime les notifs de l'onglet quand on ouvre l'onglet (si on est scrollé tout en bas)
 	$(window).on('focus', function(){
 		checkScroll();
 		if(atBottom === true)
 			removeNotification();
 	});
 	
+	//  Ecouteur qui dit au serveur d'afficher la liste de commandes au click sur le lien dans la sidebar
+	cmdButton.on('click', function(){
+		socket.emit('showCmds');
+	});
+
+
 	//  La méthode socket.on permet d'écouter un événement envoyé par le serveur. 
 	//  On précise le nom de l'événement envoyé par le serveur en premier argument,
 	//  et une fonction à exécuter quand l'événement se déclenche en deuxième argument.
@@ -152,6 +133,7 @@ $(document).ready(function(){
 		$('.online h2').html('In the chat now (' + nbOnline + ')');
 	});
 
+	//  Ecouteur qui affiche un whisper reçu
 	socket.on('whisper', function(message){
 		if(muted.indexOf(message._author) == -1){
 			checkScroll();
@@ -166,6 +148,7 @@ $(document).ready(function(){
 		}
 	});
 
+	//  Ecouteur qui affiche un whisper envoyé
 	socket.on('whisper sent', function(message){
 		checkScroll();
 		chat.append('<div class="item whisper"><span class="Author">To ' + 
@@ -176,50 +159,56 @@ $(document).ready(function(){
 		scroll(atBottom);
 	});
 
+	//  Ecouteur qui bloque un utilisateur (commande /mute)
 	socket.on('mute', function(name){
 		checkScroll();
 		if(muted.indexOf(name) != -1){
-			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>' + name + ' is already muted. /allow ' + name + ' to revert.</p>');
 		} else {
 			muted.push(name);
-			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>' + name + ' is now muted. /allow ' + name + ' to revert.</p>');
 		}
 		scroll(atBottom);
 	});
 
-	socket.on('show muted', function(){
-		checkScroll();
-		if(muted.length > 0){
-			html = '<p class="serverMessage"><span class="red">»&nbsp;</span>Currently muted: ' + muted + '</p>';
-		} else 
-			html = '<p class="serverMessage"><span class="red">»&nbsp;</span>Nobody is muted.</p>';
-		chat.append(html);
-		scroll(atBottom);
-	});
-
-	socket.on('server message', function(message){
-		checkScroll();
-		chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + message + '</p>');
-		scroll(atBottom);
-	});
-
+	//  Ecouteur qui retire le mute sur un utilisateur (commande /allow)
 	socket.on('allow', function(name){
 		checkScroll();
 		if(muted.indexOf(name) != -1){
 			muted.splice(muted.indexOf(name), 1);
-			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>You will now see messages from ' + name + ' again.</p>');
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>You will now see messages from ' + name + ' again.</p>');
 		} else {
-			chat.append('<p class="serverMessage"><span class="red">»&nbsp;</span>' + name + ' is not currently muted.</p>');
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>' + name + ' is not currently muted.</p>');
 		}
 		scroll(atBottom);
 	});
 
+	//  Ecouteur qui affiche la liste des utilisateurs bloqués (commande /muted)
+	socket.on('show muted', function(){
+		checkScroll();
+		if(muted.length > 0){
+			html = '<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>Currently muted: ' + muted + '</p>';
+		} else 
+			html = '<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>Nobody is muted.</p>';
+		chat.append(html);
+		scroll(atBottom);
+	});
+
+	//  Ecouteur qui affiche un message envoyé par le serveur
+	socket.on('server message', function(message){
+		checkScroll();
+		chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>' + message + '</p>');
+		scroll(atBottom);
+	});
+
+	//  Ecouteur qui prévient l'utilisateur lorsqu'il a été kické du chat
 	socket.on('kicked', function(){
 		$('#alertoverlay').fadeIn('slow');
 		$('#alert').html('You have been kicked out of the chat.');
 		$('#alert').fadeIn('slow');
 	});
 
+	//  Ecouteur qui prévient l'utilisateur lorsqu'il a été banni du chat
 	socket.on('banned', function(){
 		$('#loginArea').hide();
 		$('#overlay').hide();
@@ -227,4 +216,50 @@ $(document).ready(function(){
 		$('#alert').html('Your account was banned from the chat.');
 		$('#alert').fadeIn('slow');
 	});
+
+	//  Ecouteur qui affiche la liste des commandes disponibles quand on clique sur le lien dans la sidebar
+	socket.on('showCmds', function(list){
+		chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>List of commands you can use :</p>')
+		for(cmd in list){
+			checkScroll();
+			chat.append('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>' + cmd + ' : <span class="cmdDesc">' + list[cmd] + '</span></p>');
+			scroll(atBottom);
+		}
+	});
+
+	// Ecouteur qui réinitialise le chat (commande /clear)
+	socket.on('clear', function(){
+		chat.html('<p class="serverMessage"><span class="red" title="Message from the server">»&nbsp;</span>Chat cleared!</p>')
+	});
+
+
+	/*
+	 *	Fonctions utiles
+	 */
+
+	function checkScroll(){
+		$('#inner').bind('scroll', function() {
+		    	if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight)
+		    		atBottom = true;
+		    	else
+		    		atBottom = false;
+		});
+	}
+
+	function addNotification(){
+		nbNotifs++;
+		$('head title').html('Chat (' + nbNotifs + ')');
+	}
+
+	function removeNotification(){
+		nbNotifs = 0;
+		$('head title').html('Chat');
+	}
+
+	function scroll(atBottom){
+		if(atBottom === true){
+			var chat_div = document.getElementById('inner');
+			chat_div.scrollTop = chat_div.scrollHeight;
+		}
+	}
 });
