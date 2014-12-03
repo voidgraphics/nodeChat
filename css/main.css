@@ -380,6 +380,11 @@ ul#onlineUsers .status{
 .serverMessage{
     margin-left:53px;
     color:#515151;
+    letter-spacing: 1px;
+}
+
+.cmdDesc{
+    color:#8b8b8b;
 }
 
 .item{
@@ -388,9 +393,11 @@ ul#onlineUsers .status{
     margin: 12px 40px;
     border-radius: 4px;
     position: relative;
+    letter-spacing: 1px;
 }
 
 .item a{
+    text-decoration: none;
     color: #f06b6b;
 }
 
@@ -413,7 +420,6 @@ ul#onlineUsers .status{
 
 .item .message{
     color:#8b8b8b;
-    letter-spacing: 1px;
 }
 
 .item.whisper .message{
@@ -430,6 +436,7 @@ ul#onlineUsers .status{
 .item.whisper .time{
     color: white;
     font-style: normal;
+    letter-spacing: 1.4px;
 }
 
 #messageInput{
