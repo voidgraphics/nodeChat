@@ -55,7 +55,7 @@ $(document).ready(function(){
 			error = 0;
 			loginForm.fadeOut("slow");
 			$('#overlay').fadeOut("slow");
-			username.focus();
+			$('#messageInput').focus();
 			$('#username').val(username.val());
 			$('.anon').hide();
 			$('.logged').show();
