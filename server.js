@@ -43,13 +43,14 @@ io.sockets.on('connection', function(socket){
 		user: "root",
 		password: "root",
 		database: "Chat", 
-		port: 8889
+		port: 3306
 		
 	});
+	console.log(connection);
 
 
 	socket.on('showCmds', function(){
-		var list = {};
+		var list = {}, cmd;
 		for(cmd in cmdList){
 			if(cmdList[cmd].auth <= user._authority){
 				list[cmd] = cmdList[cmd].desc;
@@ -73,9 +74,10 @@ io.sockets.on('connection', function(socket){
 	function updateUserList(){
 		//  On vide la liste
 		userList = {};
+		var usr;
 		//  Puis on ajoute les infos selon le modèle {username: blabla, status: blabla}
-		for(var usr in onlineUsers){
-			userList[usr] = {username: onlineUsers[usr].username, status: onlineUsers[usr].status, avatarHash: onlineUsers[usr].avatarHash };
+		for(usr in onlineUsers){
+			userList[usr] = {username: onlineUsers[usr].username, status: onlineUsers[usr].status, avatarHash: onlineUsers[usr].avatarHash, invisible: onlineUsers[usr].invisible };
 		}
 		io.sockets.emit('updateUsersList', userList);
 	}
@@ -184,25 +186,27 @@ io.sockets.on('connection', function(socket){
 
 //  Liste de commandes disponibles sur le chat, avec description + role nécessaire pour les utiliser (0 = user, 1 = mod, 2 = admin)
 var cmdList = {
-	"/w"		: { desc: "Private message (whisper). Usage:  /w target message",			auth: 0 },
-	"/r"		: { desc: "Reply to last whisper. Usage:  /r message",					auth: 0 },
+	"/w"		: { desc: "Private message (whisper). Usage:  /w target message",				auth: 0 },
+	"/r"		: { desc: "Reply to last whisper. Usage:  /r message",						auth: 0 },
 	"/red"	: { desc: "Red text. Usage:  /red message",							auth: 0 },
 	"/b"		: { desc: "Bold text. Usage:  /b message", 							auth: 0 },
 	"/i"		: { desc: "Italic text. Usage:  /i message", 							auth: 0 },
-	"/online"	: { desc: "Changes status to online. Usage:  /online", 					auth: 0 },
+	"/online"	: { desc: "Changes status to online. Usage:  /online", 						auth: 0 },
 	"/busy"	: { desc: "Changes status to busy. Usage:  /busy", 						auth: 0 },
 	"/away"	: { desc: "Changes status to away. Usage:  /away", 						auth: 0 },
-	"/status"	: { desc: "Changes status to custom value. Usage:  /status value", 			auth: 0 },
-	"/mute"	: { desc: "Blocks messages from somebody. Usage:  /mute target", 			auth: 0 },
+	"/status"	: { desc: "Changes status to custom value. Usage:  /status value", 				auth: 0 },
+	"/mute"	: { desc: "Blocks messages from somebody. Usage:  /mute target", 				auth: 0 },
 	"/allow"	: { desc: "Cancels the effect of /mute. Usage:  /allow target", 				auth: 0 },
 	"/muted"	: { desc: "Shows list of blocked users. Usage:  /muted", 					auth: 0 },
-	"/slap"	: { desc: "Makes a fool of somebody. Usage:  /slap target", 				auth: 0 },
+	"/clear"	: { desc: "Deletes every message in your chat. Usage:  /clear", 				auth: 0 },
+	"/slap"	: { desc: "Makes a fool of somebody. Usage:  /slap target", 					auth: 0 },
 	
-	"/admin"	: { desc: "Test for administrator privileges. Usage: /admin", 				auth: 2 },
+	"/admin"	: { desc: "Test for administrator privileges. Usage: /admin", 					auth: 2 },
 	"/mod"	: { desc: "Test for moderator privileges. Usage: /mod", 					auth: 1 },
-	"/promote"	: { desc: "Changes privileges for specified user. Usage:  /promote target role", 	auth: 2 },
-	"/kick"	: { desc: "Kicks the target out of the chat. Usage:  /kick target", 			auth: 1 },
+	"/promote"	: { desc: "Changes privileges for specified user. Usage:  /promote target role", 		auth: 2 },
+	"/kick"	: { desc: "Kicks the target out of the chat. Usage:  /kick target", 				auth: 1 },
 	"/ban"	: { desc: "Bans the target from the chat. Usage:  /ban target", 				auth: 1 },
-	"/unban"	: { desc: "Allows banned user back in the chat. Usage:  /unban target", 		auth: 1 },
-	"/clear"	: { desc: "Deletes every message in the chat. Usage:  /clear", 				auth: 1 }
+	"/unban"	: { desc: "Allows banned user back in the chat. Usage:  /unban target", 			auth: 1 },
+	"/*clear"	: { desc: "Deletes every message in the chat (for everybody). Usage:  /*clear", 		auth: 1 },
+	"/server"	: { desc: "Sends a server message to everybody. Usage:  /server message", 		auth: 2 }
 };
